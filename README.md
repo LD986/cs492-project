@@ -2,8 +2,8 @@
 
 Group Members
 - Hans Iselborn (hiselbor@stevens.edu)
-- member2 (email2)
-- member3 (email3)
+- Lewis Goldenberg (lgoldenb@stevens.edu)
+- Alexandra Craine (acraine@stevens.edu)
 
 Additional features implemented:
 
