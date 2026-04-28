@@ -1,7 +1,7 @@
 # FSX492
 
 Group Members
-- member1 (email1)
+- Hans Iselborn (hiselbor@stevens.edu)
 - member2 (email2)
 - member3 (email3)
 
