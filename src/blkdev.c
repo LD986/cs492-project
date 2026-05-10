@@ -72,12 +72,23 @@ static int blkdev_read(
     // TODO:
 
     // check if unavailable
-
+    if(im->fd < 0){
+        return BLKDEV_E_UNAVAIL;
+    }
     // check block range
-
+    if(start >= (uint32_t)im->size || n > (uint32_t)im->size - start){
+        return BLKDEV_E_BADADDR;
+    }
     // read blocks
-    
-    return BLKDEV_E_FAULT;
+    off_t offset = (off_t)start * BLKDEV_BLKSZ;
+    size_t count = (size_t)n * BLKDEV_BLKSZ;
+
+    ssize_t bytes_read = pread(im->fd, buf, count, offset);
+
+    if(bytes_read < 0 || (size_t)bytes_read != count) {
+        return BLKDEV_E_FAULT;
+    }
+    return BLKDEV_SUCCESS;
 }
 
 
@@ -105,12 +116,23 @@ static int blkdev_write(
     // TODO:
 
     // check if unavailable
-    
+    if(im->fd < 0){
+        return BLKDEV_E_UNAVAIL;
+    }
     // check block range
-
+    if(start == 0 || start >= (uint32_t)im->size || n > (uint32_t)im->size - start){
+        return BLKDEV_E_BADADDR;
+    }
     // write blocks
+    off_t offset = (off_t)start * BLKDEV_BLKSZ;
+    size_t count = (size_t)n * BLKDEV_BLKSZ;
 
-    return BLKDEV_E_FAULT;
+    ssize_t bytes_written = pwrite(im->fd, buf, count, offset);
+
+    if(bytes_written < 0 || (size_t)bytes_written != count) {
+        return BLKDEV_E_FAULT;
+    }
+    return BLKDEV_SUCCESS;
 }
 
 
@@ -132,8 +154,10 @@ static int blkdev_flush(struct blkdev * dev, uint32_t start, uint32_t n)
     assert(im);
 
     // TODO:
-
-    return BLKDEV_E_FAULT;
+    if(im->fd < 0) {
+        return BLKDEV_E_UNAVAIL;
+    }
+    return BLKDEV_SUCCESS;
 }
 
 
@@ -160,9 +184,17 @@ static void blkdev_close(struct blkdev * dev)
     // TODO:
 
     // close image file
+    if(im->fd >= 0){
+        close(im->fd);
+        im->fd = -1;
+    }
 
     // free allocated memory
+    free(im->path);
+    im->path = NULL;
 
+    free(im);
+    dev->private = NULL;
 }
 
 /**
@@ -204,7 +236,10 @@ int blkdev_init(struct blkdev * dev, char * imgpath)
         return BLKDEV_E_BADDEV;
     }
     // todo: should add a check that this is a regular file
-
+    if (!S_ISREG(sb.st_mode)) {
+        fprintf(stderr, "image is not a regular file: %s\n", imgpath);
+        return BLKDEV_E_BADDEV;
+    }
     // check that file is a multiple of block size
     if (sb.st_size % BLKDEV_BLKSZ) {
         fprintf(stderr, "image size is not a multiple of block size %d: %s\n",
