@@ -1542,7 +1542,7 @@ int fsx492_mkdir(const char * path, mode_t mode)
     int ret;
     uint32_t ino = 0, parent_ino = 0;
     // lookup parent directory path (see docs for `lookup_path`)
-    if(ret = lookup_path(path, ino, parent_ino) != 0){
+    if(ret = lookup_path(path, &ino, &parent_ino) != 0){
         fprintf(stderr, "fsx492_mkdir: failed to lookup path\n");
         return ret;
     }
@@ -1710,7 +1710,7 @@ int fsx492_releasedir(const char * path, struct fuse_file_info * fi)
     // TODO:
 
     // free allocated resources (file handle)
-    free(fi->fh); //probably will be malloced in fsx492_opendir
+
     // write back dirty metadata
 
     return -ENOSYS;
@@ -1737,10 +1737,16 @@ int fsx492_link(const char * oldpath, const char * newpath)
     assert(newpath);
 
     // lookup paths
-
+    uint32_t old_ino = 0, oldparent_ino = 0, new_ino = 0, newparent_ino = 0;
+    if ((ret = lookup_path(oldpath, &oldino, &oldparent_ino)) < 0) {
+        return ret;
+    }
+    if ((ret = lookup_path(newpath, &newino, &newparent_ino)) < 0) {
+        return ret;
+    }
     // link old inode to new directory inode
-
-    return -ENOSYS;
+    struct context * ctx = (struct context *)fuse_get_context()->private_data;
+    return _link(basename(newpath), old_ino, newparent_ino, ctx);
 }
 
 
@@ -1951,7 +1957,7 @@ int fsx492_chmod(const char * path, mode_t mode, struct fuse_file_info * fi)
     // TODO:
 
     // lookup inode
-
+    
     // update mode bits (directories and regular files only)
 
     return -ENOSYS;
