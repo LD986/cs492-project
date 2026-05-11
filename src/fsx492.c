@@ -507,7 +507,15 @@ static inline ssize_t search_block(
 
     // find index of `name` parameter if found in `entries` array
 
-    return -ENOSYS;
+    //this solu rn only searches 1 block per call of search_block
+    //unsure of when to disk err
+    for(int i = 0; i<FSX492_DIRENTRIES_PER_BLK; i++){
+        if(entries[i].name == name){
+            return i;
+        }
+    }
+
+    return -ENOENT;
 }
 
 /**
@@ -532,11 +540,38 @@ static int find_entry(
 
     // TODO:
 
-    // check if directory
+    //unsure of where to check if directory does not exist for ENOENT,
+    // seems to fall under if ENOTDIR since if it is not a directory inode the directory doesnt exist
 
+    fprintf(stdout,"find_entry\n");
+    if(dir_ino == 0){
+        return -EINVAL;
+    }
+    // check if directory
+    if(validate_inode(dir_ino, ctx) < 0){
+        return -ENOTDIR;
+    }
+    struct fsx492_inode * dir_inode = &ctx->inodes[dir_ino];
+    if (!S_ISDIR(dir_inode->mode)){
+        return -ENOTDIR;
+    }
     // search directory entries in direct_blks
 
-    return -ENOSYS;
+    struct fsx492_dirent entries[FSX492_DIRENTRIES_PER_BLK];
+    
+    for (int i = 0; i < FSX492_N_DIRECT; i++) {
+
+        // load the direct block of entries
+        if (read_blks(dir_inode->direct_blks[i], 1, (void *)entries) < 0) {
+            return -EIO;
+        }
+
+    }
+    if(ino = search_block(name, entries) < 0){
+        return -ENOENT //name no exist
+    }
+
+    return 0; //name found, written to ino
 }
 
 
@@ -803,8 +838,19 @@ static int _link(
 
     // validate name length
 
+    //just going to assume name is null terminated
+    int i = 0;
+    while(name[i] != '\0'){
+        i++;
+    } //should include null term in length, so check is <= to include for null term as per fsx492.h
+    if(i <= FSX492_FILENAMESZ){
+        return -EINVAL;
+    }
+
     // validate directory inode
-    
+    if(validate_inode(dir_ino, ctx) < 0){
+        return -ENOTDIR;
+    }
     // load directory entries from disk
 
     // find a free directory entry (allocate new blocks as needed)
@@ -1027,14 +1073,24 @@ int fsx492_getattr(
     fprintf(stdout, "fsx492_getattr: %s\n", path);
     assert(path);
     struct context * ctx = (struct context *)fuse_get_context()->private_data;
-
+    int ret;
+    int ino;
     // TODO:
+
+    //unsure of handling errors here, seems fine to me but like a second eye
 
     // lookup inode (or skip lookup if handle already open in fi)
 
-    // copy stat info to statbuf
 
-    return -ENOSYS;
+    if (fi) {
+        ino = ((struct fh *)fi->fh)->ino;
+    } else if ((ret = lookup_path(path, &ino, NULL)) < 0) {
+        return ret;
+    }
+    // copy stat info to statbuf
+    copy_stat(ino, statbuf);
+
+    return 0;
 }
 
 
@@ -1177,6 +1233,10 @@ int fsx492_open(const char * path, struct fuse_file_info * fi)
     // TODO:
 
     // lookup path and validate inode
+    int ino = ((struct fh *)fi->fh)->ino;
+    if (validate_inode(ino, ctx) < 0) {
+        return -EBADF;
+    }
 
     // (option: perform permissions checking)
 
@@ -1184,7 +1244,7 @@ int fsx492_open(const char * path, struct fuse_file_info * fi)
 
     // store file handle in fi->fh
 
-    return -ENOSYS;
+    return 0;
 }
 
 
@@ -1478,13 +1538,20 @@ int fsx492_mkdir(const char * path, mode_t mode)
 {
     fprintf(stdout, "fsx492_mkdir: %s\n", path);
     struct context * ctx = (struct context *)fuse_get_context()->private_data;
-
     // TODO:
-
+    int ret;
+    uint32_t ino = 0, parent_ino = 0;
     // lookup parent directory path (see docs for `lookup_path`)
-
+    if(ret = lookup_path(path, ino, parent_ino) != 0){
+        fprintf(stderr, "fsx492_mkdir: failed to lookup path\n");
+        return ret;
+    }
     // create a new directory inode
-
+    uint32_t ino = 0;
+    if ((ret = alloc_inode(&ino, ctx)) < 0) {
+        fprintf(stderr, "fsx492_mkdir: failed to allocate inode\n");
+        return ret;
+    }
     // allocate space for directory entries
 
     // add `.` and `..` subdirectories
@@ -1493,7 +1560,7 @@ int fsx492_mkdir(const char * path, mode_t mode)
 
     // mark dirty inodes for writeback
 
-    return -ENOSYS;
+    return ret; //should be 0
 }
 
 
@@ -1643,7 +1710,7 @@ int fsx492_releasedir(const char * path, struct fuse_file_info * fi)
     // TODO:
 
     // free allocated resources (file handle)
-
+    free(fi->fh); //probably will be malloced in fsx492_opendir
     // write back dirty metadata
 
     return -ENOSYS;
