@@ -160,7 +160,7 @@ static inline int clear_blks(uint32_t start, uint32_t n)
  */
 static inline int validate_block(uint32_t blkno, struct context * ctx)
 {
-    return !FD_ISSET(blkno, ctx->block_map) ? -EINVAL : 0;
+    return (!blkno || !FD_ISSET(blkno, ctx->block_map)) ? -EINVAL : 0;
 }
 
 /**
@@ -235,7 +235,7 @@ static inline size_t count_avail_blks(struct context * ctx)
  */
 static inline int validate_inode(uint32_t ino, struct context * ctx)
 {
-    return !FD_ISSET(ino, ctx->inode_map) ? -EINVAL : 0;
+    return (!ino || !FD_ISSET(ino, ctx->inode_map)) ? -EINVAL : 0;
 }
 
 
@@ -869,10 +869,16 @@ static int _link(
     // check if name already exists in directory
     uint32_t existing_ino = 0;
     int ret = find_entry(name, dir_ino, &existing_ino, ctx);
-    if(ret == 0) {
-        return -EEXIST;
+    if (ret == 0) {
+    return -EEXIST;
     }
-    if(ret == -EIO) {
+    if (ret == -EIO) {
+        return -EIO;
+    }
+    if (ret == -ENOTDIR || ret == -EINVAL) {
+        return -ENOTDIR;
+    }
+    if (ret != -ENOENT) {
         return -EIO;
     }
 
@@ -1208,9 +1214,10 @@ int fsx492_getattr(
 {
     fprintf(stdout, "fsx492_getattr: %s\n", path);
     assert(path);
+    assert(statbuf);
     struct context * ctx = (struct context *)fuse_get_context()->private_data;
-    int ret;
-    int ino;
+    int ret = 0;
+    uint32_t ino = 0;
     // TODO:
 
     //unsure of handling errors here, seems fine to me but like a second eye
@@ -1218,13 +1225,17 @@ int fsx492_getattr(
     // lookup inode (or skip lookup if handle already open in fi)
 
 
-    if (fi) {
+    if (fi && fi->fh) {
         ino = ((struct fh *)fi->fh)->ino;
     } else if ((ret = lookup_path(path, &ino, NULL)) < 0) {
         return ret;
     }
+
+    if(validate_inode(ino, ctx) < 0){
+        return -ENOENT;
+    }
     // copy stat info to statbuf
-    copy_stat(ino, statbuf);
+    copy_stat(&ctx->inodes[ino], statbuf);
 
     return 0;
 }
@@ -1718,18 +1729,39 @@ int fsx492_opendir(const char * path, struct fuse_file_info * fi)
     fprintf(stdout, "fsx492_opendir: %s\n", path);
     assert(fi);
     struct context * ctx = (struct context *)fuse_get_context()->private_data;
+    int ret = 0;
+    uint32_t = 0;
     
     // TODO:
 
     // look up the directory inode
+    if((ret = lookup_path(path, &ino, NULL)) < 0){
+        return ret;
+    }
+    
+    if(validate_inode(ino, ctx) < 0){
+        return -ENOENT;
+    }
+    
+    struct fsx492_inode * inode = &ctx->inodes[ino];
 
+    if(!S_ISDIR(inode->mode)){
+        return -ENOTDIR;
+    }
     // create a new file handle
+    struct fh * handle = malloc(sizeof(*handle));
+    if(!handle) {
+        return -ENOSPC;
+    }
 
+    handle->ino = ino;
+    handle->flags = fi->flags;
     // (optional) perform permissions checking
 
     // update fi with file handle
+    fi->fh = (uint64_t)handle;
 
-    return -ENOSYS;
+    return 0;
 }
 
 
