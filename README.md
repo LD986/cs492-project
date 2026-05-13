@@ -43,7 +43,7 @@ They are listed in suggested order of implementation.
 - [X] `fsx492_getattr` (high priority)
 - [X] `fsx492_opendir` (high priority)
 - [X] `fsx492_releasedir` (high priority)
-- [WIP] `fsx492_mkdir`
+- [X] `fsx492_mkdir`
 - [X] `fsx492_rmdir`
 - [X] `fsx492_open`
 - [X] `fsx492_release`

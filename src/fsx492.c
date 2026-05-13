@@ -1392,7 +1392,7 @@ int fsx492_open(const char * path, struct fuse_file_info * fi)
     if (S_ISDIR(ctx->inodes[ino].mode)) {
         return -EISDIR;
     }
-    
+
     // create the file handle
     struct fh * handle = malloc(sizeof(*handle));
     if(!handle) {
@@ -1977,13 +1977,17 @@ int fsx492_mkdir(const char * path, mode_t mode)
 {
     fprintf(stdout, "fsx492_mkdir: %s\n", path);
     struct context * ctx = (struct context *)fuse_get_context()->private_data;
-    // TODO:
     int ret;
     uint32_t ino = 0, parent_ino = 0;
     // lookup parent directory path (see docs for `lookup_path`)
-    if((ret = lookup_path(path, &ino, &parent_ino)) != 0){
-        fprintf(stderr, "fsx492_mkdir: failed to lookup path\n");
+    if((ret = lookup_path(path, &ino, &parent_ino)) == 0){
+        return -EEXIST;
+    } else if(ret == -EIO || ret == -ENOTDIR || ret == -EINVAL){
         return ret;
+    } else if(ret == -ENOENT){
+        if(!ino){
+            return ret;
+        }
     }
     // create a new directory inode
     ino = 0;
@@ -1993,47 +1997,41 @@ int fsx492_mkdir(const char * path, mode_t mode)
     }
     struct fsx492_inode * inode = &ctx->inodes[ino];
     inode->ino = ino;
-    inode->mode = mode; //this may need to be changed
+    inode->mode = mode | S_IFDIR;
     inode->uid = getuid();
     inode->gid = getgid();
-    inode->size = 0; //this may need to be changed
+    inode->size = 0;
     inode->nlink = 0;
     inode->blocks = 0;
     inode->ctime = inode->mtime = inode->atime = time(NULL);
-    for (int i = 0; i < FSX492_N_DIRECT; i++) {
-        inode->direct_blks[0] = 0;
-    }
+    inode->direct_blks[0] = 0;
     inode->indir1_blks = 0;
     inode->indir2_blks = 0;
 
     // allocate space for directory entries
-    struct fsx492_dirent entries[FSX492_DIRENTRIES_PER_BLK];
     uint32_t blkno = 0;
-    for(int i = 0; i < FSX492_N_DIRECT; i++){
-        blkno = inode->direct_blks[i];
-        if(blkno == 0) { // block doesn't exist, should be always
-            ret = alloc_blk(&blkno, ctx);
-            if(ret == -ENOSPC){
-                return -ENOSPC;
-            }
-            if(ret < 0){
-                return -EIO;
-            }
-            inode->direct_blks[i] = blkno;
-            inode->blocks++;
-            memset(entries, 0, sizeof(entries));
-        }
+    ret = alloc_blk(&blkno, ctx);
+    if(ret == -ENOSPC){
+        return -ENOSPC;
     }
-    // add `.` and `..` subdirectories
+    if(ret < 0){
+        return -EIO;
+    }
+    inode->direct_blks[0] = blkno;
+    inode->blocks++;
 
-    //unsure on how, intuition is recursion, probably wrong
+    // add `.` and `..` subdirectories
+    dirty_inode(ino, ctx);
+    if((ret = _link(".", ino, ino, ctx)) < 0) {
+        return ret;
+    }
 
     // link new directory to parent directory
     if((ret = _link("..", ino, parent_ino, ctx)) < 0) {
         return ret;
     }
+
     // mark dirty inodes for writeback
-    dirty_inode(ino, ctx);
     dirty_inode(parent_ino, ctx);
     return 0;
 }
