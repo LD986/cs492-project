@@ -1922,13 +1922,16 @@ int fsx492_release(const char * path, struct fuse_file_info * fi)
     fprintf(stdout, "fsx492_release: %s\n", path);
     assert(path);
 
-    // TODO:
-
     // release resources from opened file (e.g. file handle)
-
+        if(fi->fh != 0){
+            free((struct fh *)fi->fh);
+            fi->fh = 0;
+        } else {
+            return -EBADF;
+        }
     // write back metadata
+        return(writeback_metadata((struct context *)fuse_get_context()->private_data));
 
-    return -ENOSYS;
 }
 
 
@@ -2251,20 +2254,34 @@ int fsx492_rmdir(const char * path)
 {
     fprintf(stdout, "fsx492_rmdir: %s\n", path);
     assert(path);
-
-    // TODO:
-
+    uint32_t ino = 0, parent_ino = 0;
+    int ret = 0;
     // lookup directory inode
-
+    if ((ret = lookup_path(path, &ino, &parent_ino)) < 0) {
+        return ret;
+    }
     // confirm inode is directory
-
+    struct context * ctx = (struct context *)fuse_get_context()->private_data;
+    if(validate_inode(ino, ctx) < 0){
+        return -ENOENT;
+    }
+    struct fsx492_inode * dir_inode = &ctx->inodes[ino];
+    if (!S_ISDIR(dir_inode->mode)){
+        return -ENOTDIR;
+    }
     // confirm directory is empty (only `.` and `..` entries)
-
+    if(dir_inode->nlink != 2) {
+        return -ENOTEMPTY;
+    }
     // remove `.` and `..` subdirectories
-
+    if((ret =_unlink(".", ino, ctx)) < 0) {
+        return ret;
+    }
+    if((ret = _unlink("..", ino, ctx)) < 0) {
+        return ret;
+    }
     // unlink directory inode from parent
-
-    return -ENOSYS;
+    return(_unlink(basename(path), parent_ino, ctx));
 }
 
 

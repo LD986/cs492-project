@@ -44,9 +44,9 @@ They are listed in suggested order of implementation.
 - [X] `fsx492_opendir` (high priority)
 - [X] `fsx492_releasedir` (high priority)
 - [ ] `fsx492_mkdir`
-- [ ] `fsx492_rmdir`
+- [X] `fsx492_rmdir`
 - [ ] `fsx492_open`
-- [ ] `fsx492_release`
+- [X] `fsx492_release`
 - [X] `fsx492_write` (difficult)
 - [ ] `fsx492_link`
 - [ ] `fsx492_chmod`
