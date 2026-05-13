@@ -104,7 +104,9 @@ def test_file_overwrite(mountpoint):
 
     with open(path, "w") as f: #make content to overwrite in test
         f.write("philippe")
+    with open(path, "r") as f:
         olddata = f.read()
+    print(olddata);
     assert "philippe" == olddata, "overwriting content of file failure(1)"
 
     print("check2")
@@ -112,6 +114,7 @@ def test_file_overwrite(mountpoint):
     write_time = str(time.time()) #https://www.geeksforgeeks.org/python/python-time-module/, ensures test integrity
     with open(path, "w") as f:
         f.write(write_time) #https://www.geeksforgeeks.org/python/open-a-file-in-python/
+    with open(path, "r") as f:
         newdata = f.read()
     assert write_time == newdata, "overwriting content of file failure (2)"
     assert "philippe" not in newdata, "overwriting content of file failure(3)" #data overwritten
@@ -122,14 +125,17 @@ def test_open_file_in_append(mountpoint):
     path = os.path.join(mountpoint, "hello.txt")
     with open(path, "w") as f: #make content to append to in test
         f.write("philippe")
+    with open(path, "r") as f:
         olddata = f.read()
-    assert "philippe" == olddata, "opening a file in append mode failure(1)"
+    #assert "philippe" == olddata, "opening a file in append mode failure(1)"
 
     append_time = str(time.time()) #https://www.geeksforgeeks.org/python/python-time-module/, ensures test integrity
-    with open(mountpoint, "a") as f:
+    with open(path, "a") as f:
         f.write(append_time) #https://www.geeksforgeeks.org/python/open-a-file-in-python/
+    with open(path, "r") as f:
         newdata = f.read()
-    assert "philippe"+append_time == data, "opening a file in append mode failure(2)" #file content should be "philippe<remove_<>_and_time_goes_here>"
+    print(newdata)
+    assert "philippe"+append_time == newdata, "opening a file in append mode failure(2)" #file content should be "philippe<remove_<>_and_time_goes_here>"
     print("[test] opening a file in \"append\" mode (see `open` behavior) passed")
 
 def test_count_hard_links(mountpoint):
@@ -142,15 +148,17 @@ def test_count_hard_links(mountpoint):
         f.write('duncan is cool!') #deciding not to test write because overwrite test exists, this is just to make the file exist
     assert os.path.exists(path_a), "counting hard links failure(1)"
     oldst = os.stat(path_a)
-    assert st.st_nlink == 1, "counting hard links failure(2)" #https://docs.python.org/3/library/stat.html, file properly created with a singular link
+    assert oldst.st_nlink == 1, "counting hard links failure(2)" #https://docs.python.org/3/library/stat.html, file properly created with a singular link
 
     #https://www.geeksforgeeks.org/python/python-os-link-method/
     os.link(path_a, path_b)
     os.link(path_a, path_c)
-    assert st.st_nlink == 3, "counting hard links failure(3)" #https://docs.python.org/3/library/stat.html, file properly linked with 2 other files
+    newst = os.stat(path_a)
+    assert newst.st_nlink == 3, "counting hard links failure(3)" #https://docs.python.org/3/library/stat.html, file properly linked with 2 other files
 
     os.unlink(path_c) #https://www.delftstack.com/api/python/python-os-unlink/
-    assert st.st_nlink == 2, "counting hard links failure(4)" #https://docs.python.org/3/library/stat.html, file properly unlinked
+    newestst = os.stat(path_a)
+    assert newestst.st_nlink == 2, "counting hard links failure(4)" #https://docs.python.org/3/library/stat.html, file properly unlinked
     print("[test] counting hard links passed")
 
 
