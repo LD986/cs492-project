@@ -1376,28 +1376,31 @@ int fsx492_open(const char * path, struct fuse_file_info * fi)
     fprintf(stdout, "fsx492_open: %s\n", path);
     assert(fi);
     struct context * ctx = (struct context *)fuse_get_context()->private_data;
-
-    // TODO:
+    int ret = 0;
+    uint32_t ino = 0;
 
     // lookup path and validate inode
-    int ino = ((struct fh *)fi->fh)->ino;
+    if ((ret = lookup_path(path, &ino, NULL)) < 0) {
+        return ret;
+    }
     if (validate_inode(ino, ctx) < 0) {
-        return -EBADF;
+        return -ENOENT;
     }
 
     // (option: perform permissions checking)
     // i ASSUME this means optional idk
-
+    if (S_ISDIR(ctx->inodes[ino].mode)) {
+        return -EISDIR;
+    }
+    
     // create the file handle
-
     struct fh * handle = malloc(sizeof(*handle));
     if(!handle) {
         return -ENOSPC;
     }
-
     handle->ino = ino;
     handle->flags = fi->flags;
-
+    
     // store file handle in fi->fh
     fi->fh = (uint64_t)handle;
 
