@@ -21,6 +21,82 @@ MOUNT_TIMEOUT = 10              # seconds
 
 # define tests below by creating functions that are prefixed with "test_"
 
+def test_add_rem_from_sub(mountpoint):
+    print(f"[test] adding and removing files from subdirectories")
+    path = os.path.join(mountpoint, "weloveryan.txt")
+    with open (path, 'w') as f:
+        f.write('duncan is cool!')
+    assert os.path.exists(path), "adding and removing files from subdirectories failure(1)"
+    os.remove('weloveryan.txt')
+    assert not os.path.exists(path), "adding and removing files from subdirectories failure(1)"
+    #add source when laptop restart tmr
+
+
+
+
+
+def test_add_rem_mult_block_simul(mountpoint):
+    print(f"[test] adding and removing more than a block's worth of directories (at once)")
+    newdirs_path = "./alpha/beta/charlie/daniel/edward/frugal/giselle/helps/intelligent/jack/kim/leo/minecraft/newton/over/pond/quiz/rust/stair/tour/umbrella/veal/wise/xander/zed"
+    path = os.path.join(mountpoint, newdirs_path)
+    os.makedirs(path)
+    os.removedirs("./alpha")
+    #memo to find some way to assert this tmr, and include source
+
+
+
+def test_file_overwrite(mountpoint):
+    print(f"overwriting a file (see `open` behavior)")
+    write_time = str(time.time()) #https://www.geeksforgeeks.org/python/python-time-module/
+    with open(mountpoint, "a") as f:
+        f.write(write_time) #https://www.geeksforgeeks.org/python/open-a-file-in-python/
+        data = f.read()
+    assert("hello" not in data, "overwriting content of file failure (1)")
+    assert(write_time in data, "overwriting content of file failure (2)")
+
+def test_open_file_in_append(mountpoint):
+    print(f"opening a file in \"append\" mode (see `open` behavior)") #gets current append time, uses that to ensure test integrity
+
+    append_time = str(time.time()) #https://www.geeksforgeeks.org/python/python-time-module/
+    with open(mountpoint, "a") as f:
+        f.write(append_time) #https://www.geeksforgeeks.org/python/open-a-file-in-python/
+        data = f.read()
+    assert(append_time in data, "opening a file in append mode failure")
+
+def test_count_hard_links(mountpoint):
+    print(f"counting hard links")
+    st = os.stat(mountpoint)
+    #assert(st.st_nlink == ??, "counting hard links failure") https://docs.python.org/3/library/stat.html, need to figure out a good test case
+
+
+def test_acc_or_mod_time(mountpoint):
+    print(f"update access/modification time")
+    st = os.stat(mountpoint)
+    old_atime = st.st_atime
+    old_mtime = st.st_mtime
+    s.utime(mountpoint,(1330712280, 1330712292)) #https://www.tutorialspoint.com/python/os_utime.htm, https://stackoverflow.com/questions/11348953/how-can-i-set-the-last-modified-time-of-a-file-from-python
+    new_st = os.stat(mountpoint)
+    new_atime = new_st.st_atime
+    new_mtime = new_st.st_mtime
+    assert(old_atime != new_atime, "update access time failure(1)")
+    assert(old_mtime != new_mtime, "update modification time failure(1)")
+    assert(new_atime == 1330712280, "update access time failure(2)")
+    assert(nwew_mtime == 1330712292, "update modification time failure(2)")
+
+
+
+
+def test_change_perms(mountpoint):
+    print(f"changing permissions")
+    os.chmod(mountpoint, 0o444) #memo for me to put stackoverflow link once i restart vm tmr, makes file readonly to all
+    st = os.stat(mountpoint)
+    assert(os.access(mountpoint, os.R_OK), "changing perms failure(1)")
+    assert(os.access(mountpoint, os.W_OK), "changing perms failure(2)")
+    assert(os.access(mountpoint, os.X_OK), "changing perms failure(3)")
+
+
+
+
 
 def test_basic(mountpoint):
 
@@ -61,8 +137,22 @@ def test_basic(mountpoint):
     st = os.stat(path)
     assert st.st_size == len("hello world!\n"), "invalid file size"
 
-    print("[test] passed basic")
+    # TEST: adding and removing files from subdirectories
+    
+    # TEST: adding and removing more than a block's worth of directories (at once)
 
+    #TEST: overwriting a file (see `open` behavior)
+
+    #TEST: opening a file in "append" mode (see `open` behavior)
+
+    #TEST: counting hard links
+
+    #TEST: update access/modification time
+
+    #TEST: changing permissions
+
+
+    print("[test] passed basic")
 
 def test_large_file(mountpoint):
 
@@ -278,5 +368,3 @@ if __name__ == "__main__":
 
     shutil.rmtree(mountpoint)
     print("[main] done")
-
-
