@@ -97,13 +97,13 @@ def test_file_overwrite(mountpoint):
     with open(path, "w") as f: #make content to overwrite in test
         f.write("philippe")
         olddata = f.read()
-    assert("philippe" == olddata, "overwriting content of file failure(1)")
+    assert "philippe" == olddata, "overwriting content of file failure(1)"
     write_time = str(time.time()) #https://www.geeksforgeeks.org/python/python-time-module/, ensures test integrity
     with open(path, "w") as f:
         f.write(write_time) #https://www.geeksforgeeks.org/python/open-a-file-in-python/
         newdata = f.read()
-    assert(write_time == newdata, "overwriting content of file failure (2)")
-    assert("philippe" not in newdata, "overwriting content of file failure(3)") #data overwritten
+    assert write_time == newdata, "overwriting content of file failure (2)"
+    assert "philippe" not in newdata, "overwriting content of file failure(3)" #data overwritten
     print("[test] overwriting a file (see `open` behavior) passed")
 
 def test_open_file_in_append(mountpoint):
@@ -112,13 +112,13 @@ def test_open_file_in_append(mountpoint):
     with open(path, "w") as f: #make content to append to in test
         f.write("philippe")
         olddata = f.read()
-    assert("philippe" == olddata, "opening a file in append mode failure(1)")
+    assert "philippe" == olddata, "opening a file in append mode failure(1)"
 
     append_time = str(time.time()) #https://www.geeksforgeeks.org/python/python-time-module/, ensures test integrity
     with open(mountpoint, "a") as f:
         f.write(append_time) #https://www.geeksforgeeks.org/python/open-a-file-in-python/
         newdata = f.read()
-    assert("philippe"+append_time == data, "opening a file in append mode failure(2)") #file content should be "philippe<remove_<>_and_time_goes_here>"
+    assert "philippe"+append_time == data, "opening a file in append mode failure(2)" #file content should be "philippe<remove_<>_and_time_goes_here>"
     print("[test] opening a file in \"append\" mode (see `open` behavior) passed")
 
 def test_count_hard_links(mountpoint):
@@ -131,15 +131,15 @@ def test_count_hard_links(mountpoint):
         f.write('duncan is cool!') #deciding not to test write because overwrite test exists, this is just to make the file exist
     assert os.path.exists(path_a), "counting hard links failure(1)"
     oldst = os.stat(path_a)
-    assert(st.st_nlink == 1, "counting hard links failure(2)") #https://docs.python.org/3/library/stat.html, file properly created with a singular link
+    assert st.st_nlink == 1, "counting hard links failure(2)" #https://docs.python.org/3/library/stat.html, file properly created with a singular link
 
     #https://www.geeksforgeeks.org/python/python-os-link-method/
     os.link(path_a, path_b)
     os.link(path_a, path_c)
-    assert(st.st_nlink == 3, "counting hard links failure(3)") #https://docs.python.org/3/library/stat.html, file properly linked with 2 other files
+    assert st.st_nlink == 3, "counting hard links failure(3)" #https://docs.python.org/3/library/stat.html, file properly linked with 2 other files
 
     os.unlink(path_c) #https://www.delftstack.com/api/python/python-os-unlink/
-    assert(st.st_nlink == 2, "counting hard links failure(4)") #https://docs.python.org/3/library/stat.html, file properly unlinked
+    assert st.st_nlink == 2, "counting hard links failure(4)" #https://docs.python.org/3/library/stat.html, file properly unlinked
     print("[test] counting hard links passed")
 
 
@@ -154,10 +154,10 @@ def test_acc_or_mod_time(mountpoint):
     new_st = os.stat(mountpoint)
     new_atime = new_st.st_atime
     new_mtime = new_st.st_mtime
-    assert(old_atime != new_atime, "update access time failure(1)")
-    assert(old_mtime != new_mtime, "update modification time failure(1)")
-    assert(new_atime == 1330712280, "update access time failure(2)")
-    assert(nwew_mtime == 1330712292, "update modification time failure(2)")
+    assert old_atime != new_atime, "update access time failure(1)"
+    assert old_mtime != new_mtime, "update modification time failure(1)"
+    assert new_atime == 1330712280, "update access time failure(2)"
+    assert nwew_mtime == 1330712292, "update modification time failure(2)"
     print("[test] update access/modification time passed")
 
 
@@ -167,9 +167,9 @@ def test_change_perms(mountpoint):
     print(f"[test] changing permissions {mountpoint}")
     os.chmod(mountpoint, 0o444) #https://stackoverflow.com/questions/16249440/changing-file-permission-in-python
     st = os.stat(mountpoint)
-    assert(os.access(mountpoint, os.R_OK), "changing perms failure(1)")
-    assert(os.access(mountpoint, os.W_OK), "changing perms failure(2)")
-    assert(os.access(mountpoint, os.X_OK), "changing perms failure(3)")
+    assert os.access(mountpoint, os.R_OK), "changing perms failure(1)"
+    assert os.access(mountpoint, os.W_OK), "changing perms failure(2)"
+    assert os.access(mountpoint, os.X_OK), "changing perms failure(3)"
     #https://www.tutorialspoint.com/article/How-to-check-the-permissions-of-a-file-using-Python
     print("[test] changing permissions passed")
 
