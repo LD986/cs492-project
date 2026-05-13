@@ -1599,17 +1599,293 @@ int fsx492_write(const char * path, const char * buf, size_t size,
     // TODO:
 
     // validate file handle
+    if(!(fi && fi->fh)){  
+        return -EBADF;
+    }
 
+    struct fh * handle = (struct fh *)fi->fh;
+    uint32_t ino = handle->ino;
+
+    if(validate_inode(ino, ctx) < 0){
+        return -EBADF;
+    }
+
+    struct fsx492_inode * inode = &ctx->inodes[ino];
+
+    if(S_ISDIR(inode->mode)){
+        return -EISDIR;
+    }
+
+    if(offset > inode->size){
+        return -EINVAL;
+    }
+
+    if(handle->flags & O_APPEND){ //append mode
+        offset = inode->size;
+    }
+
+    size_t original_size = size;
+    off_t original_offset = offset;
+    size_t to_write = size;
+    const char * src = buf;
     // write to direct blocks if needed (allocate space as needed)
+    while(to_write > 0 && offset < FSX492_N_DIRECT * FSX492_BLKSZ){
+        size_t direct_index = offset / FSX492_BLKSZ;
+        size_t blk_offset = offset % FSX492_BLKSZ;
+        size_t blk_wlen = FSX492_BLKSZ - blk_offset;
+
+        if(blk_wlen > to_write){
+            blk_wlen = to_write;
+        }
+
+        if(inode->direct_blks[direct_index] == 0){
+            uint32_t new_blk = 0;
+            int ret = alloc_blk(&new_blk, ctx);
+
+            if(ret == -ENOSPC){
+                return -ENOSPC;
+            }
+
+            if(ret < 0){
+                return -EIO;
+            }
+
+            inode->direct_blks[direct_index] = new_blk;
+            inode->blocks++;
+        }
+
+        uint32_t blkno = inode->direct_blks[direct_index];
+
+        if(blk_offset == 0 && blk_wlen == FSX492_BLKSZ){
+            if(write_blks(blkno, 1, (void *)src) < 0){ //empty block, no need to read into temp
+                return -EIO;
+            }
+        }
+        else {  //need to keep track of existing data
+            char tmpbuf[FSX492_BLKSZ];
+
+            if(read_blks(blkno, 1, (void *)tmpbuf) < 0){
+                return -EIO;
+            }
+
+            memcpy(tmpbuf + blk_offset, src, blk_wlen);
+
+            if(write_blks(blkno, 1, (void *)tmpbuf) < 0){
+                return -EIO;
+            }
+        }
+
+        src += blk_wlen;
+        offset += blk_wlen;
+        to_write -= blk_wlen;
+    }
 
     // write to indir1 blocks if needed (allocate space as needed)
+    while(to_write > 0 && offset < (FSX492_N_DIRECT + FSX492_PTRS_PER_BLK) * FSX492_BLKSZ) {
+        uint32_t indir_blks[FSX492_PTRS_PER_BLK];
 
+        if(inode->indir1_blks == 0){
+            uint32_t new_indir_blk = 0;
+            int ret = alloc_blk(&new_indir_blk, ctx);
+
+            if(ret == -ENOSPC){
+                return -ENOSPC;
+            }
+
+            if(ret < 0){
+                return -EIO;
+            }
+
+            inode->indir1_blks = new_indir_blk;
+            memset(indir_blks, 0, sizeof(indir_blks));
+        }
+        else {
+            if(read_blks(inode->indir1_blks, 1, (void *)indir_blks) < 0){
+                return -EIO;
+            }
+        }
+
+        size_t logical_blk = offset / FSX492_BLKSZ;
+        size_t indir_index = logical_blk - FSX492_N_DIRECT;
+        size_t blk_offset = offset % FSX492_BLKSZ;
+        size_t blk_wlen = FSX492_BLKSZ - blk_offset;
+
+        if(blk_wlen > to_write){
+            blk_wlen = to_write;
+        }
+
+        if(indir_blks[indir_index] == 0){
+            uint32_t new_data_blk = 0;
+            int ret = alloc_blk(&new_data_blk, ctx);
+
+            if(ret == -ENOSPC){
+                return -ENOSPC;
+            }
+
+            if(ret < 0){
+                return -EIO;
+            }
+
+            indir_blks[indir_index] = new_data_blk;
+            inode->blocks++;
+
+            if(write_blks(inode->indir1_blks, 1, (void *)indir_blks) < 0){
+                return -EIO;
+            }
+        }
+
+        uint32_t blkno = indir_blks[indir_index];
+
+        if(blk_offset == 0 && blk_wlen == FSX492_BLKSZ) {
+            if(write_blks(blkno, 1, (void *)src) < 0){
+                return -EIO;
+            }
+        }
+        else {
+            char tmpbuf[FSX492_BLKSZ];
+
+            if(read_blks(blkno, 1, (void *)tmpbuf) < 0){
+                return -EIO;
+            }
+
+            memcpy(tmpbuf + blk_offset, src, blk_wlen);
+
+            if(write_blks(blkno, 1, (void *)tmpbuf) < 0){
+                return -EIO;
+            }
+        }
+
+        src += blk_wlen;
+        offset += blk_wlen;
+        to_write -= blk_wlen;
+    }
     // write to indir2 blocks if needed (allocate space as needed)
+    while(to_write > 0){
+        uint32_t indir2_blks[FSX492_PTRS_PER_BLK];
+        uint32_t indir1_blks[FSX492_PTRS_PER_BLK];
 
+        size_t logical_blk = offset / FSX492_BLKSZ;
+        size_t indir2_start = FSX492_N_DIRECT + FSX492_PTRS_PER_BLK;
+        size_t rel_blk = logical_blk - indir2_start;
+
+        size_t indir2_index = rel_blk / FSX492_PTRS_PER_BLK;
+        size_t indir1_index = rel_blk % FSX492_PTRS_PER_BLK;
+
+        if(indir2_index >= FSX492_PTRS_PER_BLK) {
+            return -ENOSPC;
+        }
+
+        if(inode->indir2_blks == 0){
+            uint32_t new_indir2_blk = 0;
+            int ret = alloc_blk(&new_indir2_blk, ctx);
+
+            if(ret == -ENOSPC){
+                return -ENOSPC;
+            }
+
+            if(ret < 0){
+                return -EIO;
+            }
+
+            inode->indir2_blks = new_indir2_blk;
+            memset(indir2_blks, 0, sizeof(indir2_blks));
+        }
+        else{
+            if(read_blks(inode->indir2_blks, 1, (void *)indir2_blks) < 0){
+                return -EIO;
+            }
+        }
+
+        if(indir2_blks[indir2_index] == 0){
+            uint32_t new_indir1_blk = 0;
+            int ret = alloc_blk(&new_indir1_blk, ctx);
+
+            if(ret == -ENOSPC){
+                return -ENOSPC;
+            }
+
+            if(ret < 0){
+                return -EIO;
+            }
+
+            indir2_blks[indir2_index] = new_indir1_blk;
+            memset(indir1_blks, 0, sizeof(indir1_blks));
+
+            if(write_blks(inode->indir2_blks, 1, (void *)indir2_blks) < 0){
+                return -EIO;
+            }
+        }
+        else {
+            if(read_blks(indir2_blks[indir2_index], 1, (void *)indir1_blks) < 0){
+                return -EIO;
+            }
+        }
+
+        size_t blk_offset = offset % FSX492_BLKSZ;
+        size_t blk_wlen = FSX492_BLKSZ - blk_offset;
+
+        if(blk_wlen > to_write) {
+            blk_wlen = to_write;
+        }
+
+        if(indir1_blks[indir1_index] == 0){
+            uint32_t new_data_blk = 0;
+            int ret = alloc_blk(&new_data_blk, ctx);
+
+            if(ret == -ENOSPC){
+                return -ENOSPC;
+            }
+
+            if(ret < 0){
+                return -EIO;
+            }
+
+            indir1_blks[indir1_index] = new_data_blk;
+            inode->blocks++;
+
+            if(write_blks(indir2_blks[indir2_index], 1, (void *)indir1_blks) < 0){
+                return -EIO;
+            }
+        }
+
+        uint32_t blkno = indir1_blks[indir1_index];
+
+        if(blk_offset == 0 && blk_wlen == FSX492_BLKSZ){
+            if(write_blks(blkno, 1, (void *)src) < 0){
+                return -EIO;
+            }
+        }
+        else {
+            char tmpbuf[FSX492_BLKSZ];
+
+            if(read_blks(blkno, 1, (void *)tmpbuf) < 0){
+                return -EIO;
+            }
+
+            memcpy(tmpbuf + blk_offset, src, blk_wlen);
+
+            if(write_blks(blkno, 1, (void *)tmpbuf) < 0){
+                return -EIO;
+            }
+        }
+
+        src += blk_wlen;
+        offset += blk_wlen;
+        to_write -= blk_wlen;
+    }
     // update inode and mark dirty
+    off_t new_size = original_offset + original_size;
 
+    if(new_size > inode->size){
+        inode->size = new_size;
+    }
 
-    return -ENOSYS;
+    time_t now = time(NULL);
+    inode->mtime = now;
+    inode->ctime = now;
+    dirty_inode(inode->ino, ctx);
+
+    return (int)original_size;
 }
 
 
@@ -1730,7 +2006,7 @@ int fsx492_opendir(const char * path, struct fuse_file_info * fi)
     assert(fi);
     struct context * ctx = (struct context *)fuse_get_context()->private_data;
     int ret = 0;
-    uint32_t = 0;
+    uint32_t ino = 0;
     
     // TODO:
 
@@ -1878,10 +2154,14 @@ int fsx492_releasedir(const char * path, struct fuse_file_info * fi)
     // TODO:
 
     // free allocated resources (file handle)
-
+    if(fi->fh != 0) {
+        free((struct fh *)fi->fh);
+        fi->fh = 0;
+    } else {
+        return -EBADF;
+    }
     // write back dirty metadata
-
-    return -ENOSYS;
+    return(writeback_metadata((struct context *)fuse_get_context()->private_data));
 }
 
 
