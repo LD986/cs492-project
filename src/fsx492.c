@@ -1386,10 +1386,20 @@ int fsx492_open(const char * path, struct fuse_file_info * fi)
     }
 
     // (option: perform permissions checking)
+    // i ASSUME this means optional idk
 
     // create the file handle
 
+    struct fh * handle = malloc(sizeof(*handle));
+    if(!handle) {
+        return -ENOSPC;
+    }
+
+    handle->ino = ino;
+    handle->flags = fi->flags;
+
     // store file handle in fi->fh
+    fi->fh = (uint64_t)handle;
 
     return 0;
 }
