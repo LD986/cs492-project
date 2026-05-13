@@ -98,7 +98,7 @@ def test_add_rem_mult_block_simul(mountpoint):
 
 def test_file_overwrite(mountpoint):
     print(f"[test] overwriting a file (see `open` behavior) {mountpoint}")
-    path = os.path.join(mountpoint, "hello.txt")
+    path = os.path.join(mountpoint, "randomfilename.txt")
 
     print("check1")
 
@@ -122,12 +122,12 @@ def test_file_overwrite(mountpoint):
 
 def test_open_file_in_append(mountpoint):
     print(f"[test] opening a file in \"append\" mode (see `open` behavior) {mountpoint}")
-    path = os.path.join(mountpoint, "hello.txt")
+    path = os.path.join(mountpoint, "randomfilename.txt")
     with open(path, "w") as f: #make content to append to in test
         f.write("philippe")
     with open(path, "r") as f:
         olddata = f.read()
-    #assert "philippe" == olddata, "opening a file in append mode failure(1)"
+    assert "philippe" == olddata, "opening a file in append mode failure(1)"
 
     append_time = str(time.time()) #https://www.geeksforgeeks.org/python/python-time-module/, ensures test integrity
     with open(path, "a") as f:
