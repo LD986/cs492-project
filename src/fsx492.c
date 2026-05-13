@@ -2405,10 +2405,31 @@ int fsx492_chmod(const char * path, mode_t mode, struct fuse_file_info * fi)
     // TODO:
 
     // lookup inode
+    struct context * ctx = (struct context *)fuse_get_context()->private_data;
+
+    int ret = 0;
+    uint32_t ino = 0;
+
+    if(fi && fi->fh){
+        ino = ((struct fh *)fi->fh)->ino;
+    }
+    else if((ret = lookup_path(path, &ino, NULL)) < 0){
+        return ret;
+    }
+
+    if(validate_inode(ino, ctx) < 0){
+        return -ENOENT;
+    }
+
+    struct fsx492_inode * inode = &ctx->inodes[ino];
     
     // update mode bits (directories and regular files only)
+    inode->mode = (inode->mode & 0170000) | (mode & 07777);
+    
+    inode->ctime = time(NULL);
+    dirty_inode(inode->ino, ctx);
 
-    return -ENOSYS;
+    return 0;
 }
 
 
