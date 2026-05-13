@@ -40,7 +40,7 @@ FSX492_DIRENTSZ = 32
 # define tests below by creating functions that are prefixed with "test_"
 
 def test_add_rem_from_sub(mountpoint):
-    print(f"[test] adding and removing files from subdirectories")
+    print(f"[test] adding and removing files from subdirectories {mountpoint}")
     os.mkdir('somecoolfoldername')
     subdirpath = os.path.join(mountpoint, "somecoolfoldername")
     assert os.path.exists(subdirpath), "adding and removing files from subdirectories failure(1)"
@@ -59,16 +59,17 @@ def test_add_rem_from_sub(mountpoint):
 
 
 def test_add_rem_mult_block_simul(mountpoint):
-    print(f"[test] adding and removing more than a block's worth of directories (at once)")
+    print(f"[test] adding and removing more than a block's worth of directories (at once) {mountpoint}")
     #SEE CONFIG ABOVE IF CONFUSED
     n = (FSX492_BLKSZ/FSX492_DIRENTSZ)*2 #number of directories to add/remove at once (double the amount a blocks worth of directories)
-
+    print("wow")
     #make a subdir to make life easier and change to there
-    os.mkdir('somecoolfoldername')
-    os.cwd('somecoolfoldername')
 
+
+    #something breaks before cool print after wow print
     subdirpath = os.path.join(mountpoint, "somecoolfoldername")
-    sub_subdirpath = os.path.join(subdirpath, "testdir_"+list_of_dir_names[n/2]) #middlepoint of all the dirs created, used just to make testing simpler so not doing 1000 asserts
+    os.mkdir(subdirpath)
+    print("cool")
     assert os.path.exists(subdirpath), "adding and removing more than a block's worth of directories (at once) failure(1)"
 
     #https://www.tutorialspoint.com/article/make-multiple-directories-based-on-a-list-using-python
@@ -78,15 +79,19 @@ def test_add_rem_mult_block_simul(mountpoint):
     for i in range(0, n):
         list_of_dir_names.append("testdir_"+str(i+1))
     for dir_name in list_of_dir_names:
-        os.makedirs(list_of_dir_names)
-    assert os.path.exists(sub_subdirpath), "adding and removing more than a block's worth of directories (at once) failure(2)"
+        sub_subdirpath = os.path.join(subdirpath, "testdir_"+dir_name)
+        os.mkdir(sub_subdirpath)
+        assert os.path.exists(sub_subdirpath), "adding and removing more than a block's worth of directories (at once) failure(2)"
 
     #https://pynative.com/python-delete-files-and-directories/
     os.cwd('..')
     shutil.rmtree('somecoolfoldername') #https://stackoverflow.com/questions/10873364/shutil-rmtree-clarification
 
-    assert not os.path.exists(sub_subdirpath), "adding and removing more than a block's worth of directories (at once) failure(4)"
-    assert not os.path.exists(subdirpath), "adding and removing more than a block's worth of directories (at once) failure(3)"
+    for dir_name in list_of_dir_names:
+        sub_subdirpath = os.path.join(subdirpath, "testdir_"+dir_name)
+        assert not os.path.exists(sub_subdirpath), "adding and removing more than a block's worth of directories (at once) failure(3)"
+
+    assert not os.path.exists(subdirpath), "adding and removing more than a block's worth of directories (at once) failure(4)"
     print("[test] adding and removing more than a block's worth of directories (at once) passed")
 
 
@@ -94,10 +99,16 @@ def test_add_rem_mult_block_simul(mountpoint):
 def test_file_overwrite(mountpoint):
     print(f"[test] overwriting a file (see `open` behavior) {mountpoint}")
     path = os.path.join(mountpoint, "hello.txt")
+
+    print("check1")
+
     with open(path, "w") as f: #make content to overwrite in test
         f.write("philippe")
         olddata = f.read()
     assert "philippe" == olddata, "overwriting content of file failure(1)"
+
+    print("check2")
+
     write_time = str(time.time()) #https://www.geeksforgeeks.org/python/python-time-module/, ensures test integrity
     with open(path, "w") as f:
         f.write(write_time) #https://www.geeksforgeeks.org/python/open-a-file-in-python/
@@ -150,14 +161,14 @@ def test_acc_or_mod_time(mountpoint):
     st = os.stat(mountpoint)
     old_atime = st.st_atime
     old_mtime = st.st_mtime
-    s.utime(mountpoint,(1330712280, 1330712292)) #https://www.tutorialspoint.com/python/os_utime.htm, https://stackoverflow.com/questions/11348953/how-can-i-set-the-last-modified-time-of-a-file-from-python
+    os.utime(mountpoint,(1330712280, 1330712292)) #https://www.tutorialspoint.com/python/os_utime.htm, https://stackoverflow.com/questions/11348953/how-can-i-set-the-last-modified-time-of-a-file-from-python
     new_st = os.stat(mountpoint)
     new_atime = new_st.st_atime
     new_mtime = new_st.st_mtime
     assert old_atime != new_atime, "update access time failure(1)"
     assert old_mtime != new_mtime, "update modification time failure(1)"
     assert new_atime == 1330712280, "update access time failure(2)"
-    assert nwew_mtime == 1330712292, "update modification time failure(2)"
+    assert new_mtime == 1330712292, "update modification time failure(2)"
     print("[test] update access/modification time passed")
 
 
