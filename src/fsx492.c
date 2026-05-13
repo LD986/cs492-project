@@ -1978,15 +1978,51 @@ int fsx492_mkdir(const char * path, mode_t mode)
         fprintf(stderr, "fsx492_mkdir: failed to allocate inode\n");
         return ret;
     }
-    // allocate space for directory entries
+    struct fsx492_inode * inode = &ctx->inodes[ino];
+    inode->ino = ino;
+    inode->mode = mode; //this may need to be changed
+    inode->uid = getuid();
+    inode->gid = getgid();
+    inode->size = 0; //this may need to be changed
+    inode->nlink = 0;
+    inode->blocks = 0;
+    inode->ctime = inode->mtime = inode->atime = time(NULL);
+    for (int i = 0; i < FSX492_N_DIRECT; i++) {
+        inode->direct_blks[0] = 0;
+    }
+    inode->indir1_blks = 0;
+    inode->indir2_blks = 0;
 
+    // allocate space for directory entries
+    struct fsx492_dirent entries[FSX492_DIRENTRIES_PER_BLK];
+    uint32_t blkno = 0;
+    for(int i = 0; i < FSX492_N_DIRECT; i++){
+        blkno = inode->direct_blks[i];
+        if(blkno == 0) { // block doesn't exist, should be always
+            ret = alloc_blk(&blkno, ctx);
+            if(ret == -ENOSPC){
+                return -ENOSPC;
+            }
+            if(ret < 0){
+                return -EIO;
+            }
+            inode->direct_blks[i] = blkno;
+            inode->blocks++;
+            memset(entries, 0, sizeof(entries));
+        }
+    }
     // add `.` and `..` subdirectories
 
+    //unsure on how, intuition is recursion, probably wrong
+
     // link new directory to parent directory
-
+    if((ret = _link("..", ino, parent_ino, ctx)) < 0) {
+        return ret;
+    }
     // mark dirty inodes for writeback
-
-    return ret; //should be 0
+    dirty_inode(ino, ctx);
+    dirty_inode(parent_ino, ctx);
+    return 0;
 }
 
 
