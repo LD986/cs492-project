@@ -81,6 +81,8 @@ def test_count_hard_links(mountpoint):
     print(f"counting hard links")
     #st = os.stat(mountpoint)
     path_a = os.path.join(mountpoint, "weloveryan.txt")
+    path_b = os.path.join(mountpoint, "somefilename.txt")
+    path_c = os.path.join(mountpoint, "onemorefileforgoodluck.txt")
     with open (path_a, 'w') as f:
         f.write('duncan is cool!') #deciding not to test write because overwrite test exists, this is just to make the file exist
 
@@ -88,21 +90,13 @@ def test_count_hard_links(mountpoint):
     oldst = os.stat(path_a)
     assert(st.st_nlink == 1, "counting hard links failure(2)") #https://docs.python.org/3/library/stat.html, file properly created with a singular link
 
-
-    path_b = os.path.join(mountpoint, "somefilename.txt")
-    with open (path_b, 'w') as f:
-        f.write('hello world this file is cool') #deciding not to test write because overwrite test exists, this is just to make the file exist
-    assert os.path.exists(path_b), "counting hard links failure(3)"
-
-    path_c = os.path.join(mountpoint, "onemorefileforgoodluck.txt")
-    with open (path_c, 'w') as f:
-        f.write('third file because i can wow') #deciding not to test write because overwrite test exists, this is just to make the file exist
-    assert os.path.exists(path_c), "counting hard links failure(4)"
-
     #https://www.geeksforgeeks.org/python/python-os-link-method/
 
-
-
+    os.link(path_a, path_b)
+    os.link(path_a, path_c)
+    assert(st.st_nlink == 3, "counting hard links failure(3)") #https://docs.python.org/3/library/stat.html, file properly linked with 2 other files
+    os.unlink(path_c)
+    assert(st.st_nlink == 2, "counting hard links failure(4)") #https://docs.python.org/3/library/stat.html, file properly unlinked
 
 
 
