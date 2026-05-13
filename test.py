@@ -23,14 +23,18 @@ MOUNT_TIMEOUT = 10              # seconds
 
 def test_add_rem_from_sub(mountpoint):
     print(f"[test] adding and removing files from subdirectories")
-    path = os.path.join(mountpoint, "weloveryan.txt")
+    os.mkdir('somecoolfoldername')
+    subdirpath = os.path.join(mountpoint, "somecoolfoldername")
+    assert os.path.exists(subdirpath), "adding and removing files from subdirectories failure(1)"
+    path = os.path.join(subdirpath, "weloveryan.txt")
     with open (path, 'w') as f:
-        f.write('duncan is cool!')
-    assert os.path.exists(path), "adding and removing files from subdirectories failure(1)"
+        f.write('duncan is cool!') #deciding not to test write because overwrite test exists, this is just to make the file exist
+    assert os.path.exists(path), "adding and removing files from subdirectories failure(2)"
     os.remove('weloveryan.txt')
-    assert not os.path.exists(path), "adding and removing files from subdirectories failure(1)"
-    #add source when laptop restart tmr
-
+    assert not os.path.exists(path), "adding and removing files from subdirectories failure(3)"
+    os.rmdir(subdirpath)
+    assert not os.path.exists(subdirpath, "adding and removing files from subdirectories failure(4)")
+#https://pytutorial.com/python-os-module-file-system-operations-guide/#creating-files
 
 
 
@@ -47,26 +51,60 @@ def test_add_rem_mult_block_simul(mountpoint):
 
 def test_file_overwrite(mountpoint):
     print(f"overwriting a file (see `open` behavior)")
-    write_time = str(time.time()) #https://www.geeksforgeeks.org/python/python-time-module/
-    with open(mountpoint, "a") as f:
+    path = os.path.join(mountpoint, "hello.txt")
+    with open(path, "w") as f: #make content to overwrite in test
+        f.write("philippe")
+        olddata = f.read()
+    assert("philippe" == olddata, "overwriting content of file failure(1)")
+    write_time = str(time.time()) #https://www.geeksforgeeks.org/python/python-time-module/, ensures test integrity
+    with open(path, "w") as f:
         f.write(write_time) #https://www.geeksforgeeks.org/python/open-a-file-in-python/
-        data = f.read()
-    assert("hello" not in data, "overwriting content of file failure (1)")
-    assert(write_time in data, "overwriting content of file failure (2)")
+        newdata = f.read()
+    assert(write_time == newdata, "overwriting content of file failure (2)")
+    assert("philippe" not in newdata, "overwriting content of file failure(3)") #data overwritten
 
 def test_open_file_in_append(mountpoint):
-    print(f"opening a file in \"append\" mode (see `open` behavior)") #gets current append time, uses that to ensure test integrity
+    print(f"opening a file in \"append\" mode (see `open` behavior)")
+    path = os.path.join(mountpoint, "hello.txt")
+    with open(path, "w") as f: #make content to append to in test
+        f.write("philippe")
+        olddata = f.read()
+    assert("philippe" == olddata, "opening a file in append mode failure(1)")
 
-    append_time = str(time.time()) #https://www.geeksforgeeks.org/python/python-time-module/
+    append_time = str(time.time()) #https://www.geeksforgeeks.org/python/python-time-module/, ensures test integrity
     with open(mountpoint, "a") as f:
         f.write(append_time) #https://www.geeksforgeeks.org/python/open-a-file-in-python/
-        data = f.read()
-    assert(append_time in data, "opening a file in append mode failure")
+        newdata = f.read()
+    assert("philippe"+append_time == data, "opening a file in append mode failure(2)") #file content should be "philippe<remove_<>_and_time_goes_here>"
 
 def test_count_hard_links(mountpoint):
     print(f"counting hard links")
-    st = os.stat(mountpoint)
-    #assert(st.st_nlink == ??, "counting hard links failure") https://docs.python.org/3/library/stat.html, need to figure out a good test case
+    #st = os.stat(mountpoint)
+    path_a = os.path.join(mountpoint, "weloveryan.txt")
+    with open (path_a, 'w') as f:
+        f.write('duncan is cool!') #deciding not to test write because overwrite test exists, this is just to make the file exist
+
+    assert os.path.exists(path_a), "counting hard links failure(1)"
+    oldst = os.stat(path_a)
+    assert(st.st_nlink == 1, "counting hard links failure(2)") #https://docs.python.org/3/library/stat.html, file properly created with a singular link
+
+
+    path_b = os.path.join(mountpoint, "somefilename.txt")
+    with open (path_b, 'w') as f:
+        f.write('hello world this file is cool') #deciding not to test write because overwrite test exists, this is just to make the file exist
+    assert os.path.exists(path_b), "counting hard links failure(3)"
+
+    path_c = os.path.join(mountpoint, "onemorefileforgoodluck.txt")
+    with open (path_c, 'w') as f:
+        f.write('third file because i can wow') #deciding not to test write because overwrite test exists, this is just to make the file exist
+    assert os.path.exists(path_c), "counting hard links failure(4)"
+
+    #https://www.geeksforgeeks.org/python/python-os-link-method/
+
+
+
+
+
 
 
 def test_acc_or_mod_time(mountpoint):
@@ -88,12 +126,12 @@ def test_acc_or_mod_time(mountpoint):
 
 def test_change_perms(mountpoint):
     print(f"changing permissions")
-    os.chmod(mountpoint, 0o444) #memo for me to put stackoverflow link once i restart vm tmr, makes file readonly to all
+    os.chmod(mountpoint, 0o444) #https://stackoverflow.com/questions/16249440/changing-file-permission-in-python
     st = os.stat(mountpoint)
     assert(os.access(mountpoint, os.R_OK), "changing perms failure(1)")
     assert(os.access(mountpoint, os.W_OK), "changing perms failure(2)")
     assert(os.access(mountpoint, os.X_OK), "changing perms failure(3)")
-
+    #https://www.tutorialspoint.com/article/How-to-check-the-permissions-of-a-file-using-Python
 
 
 
@@ -136,20 +174,6 @@ def test_basic(mountpoint):
     print(f"[test] stat {path}")
     st = os.stat(path)
     assert st.st_size == len("hello world!\n"), "invalid file size"
-
-    # TEST: adding and removing files from subdirectories
-    
-    # TEST: adding and removing more than a block's worth of directories (at once)
-
-    #TEST: overwriting a file (see `open` behavior)
-
-    #TEST: opening a file in "append" mode (see `open` behavior)
-
-    #TEST: counting hard links
-
-    #TEST: update access/modification time
-
-    #TEST: changing permissions
 
 
     print("[test] passed basic")

@@ -66,13 +66,13 @@ See the `test.py` file for examples of how these can be written.
 
 You should create tests for at least the following conditions:
 
-- [ ] adding and removing files from subdirectories
+- [X] adding and removing files from subdirectories
 - [ ] adding and removing more than a block's worth of directories (at once)
-- [ ] overwriting a file (see `open` behavior)
-- [ ] opening a file in "append" mode (see `open` behavior)
-- [ ] counting hard links
-- [ ] update access/modification time
-- [ ] changing permissions
+- [X] overwriting a file (see `open` behavior)
+- [X] opening a file in "append" mode (see `open` behavior)
+- [WIP] counting hard links
+- [X] update access/modification time
+- [X] changing permissions
 
 If you implement permissions checking:
 
