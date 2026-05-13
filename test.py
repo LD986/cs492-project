@@ -12,6 +12,24 @@ import sys
 FUSE_BINARY = "fsx492"          # your compiled FS
 FUSE_ARGS = ["-f", "-d", "-s"]  # run single threaded debug mode
 MOUNT_TIMEOUT = 10              # seconds
+
+
+"""
+    enum {
+    FSX492_MAGIC    = 0xC492F11E,   // superblock magic number
+    FSX492_BLKSZ    = 1024,         // block size in bytes
+    FSX492_DIRENTSZ = 32,           // directory entry size in bytes
+    FSX492_INODESZ  = 64,           // inode size in bytes
+    };
+    from fsx492.h
+
+    ensure the following are the same values as their fsx492.h variants if they ever were to change (bc hardcoded)
+
+    only using FSX492_BLKSZ and FSX492_DIRENTSZ for now because those are required for test_add_rem_mult_block_simul(mountpoint)
+"""
+FSX492_BLKSZ = 1024
+FSX492_DIRENTSZ = 32
+
 # ------------------------
 
 
@@ -34,6 +52,7 @@ def test_add_rem_from_sub(mountpoint):
     assert not os.path.exists(path), "adding and removing files from subdirectories failure(3)"
     os.rmdir(subdirpath)
     assert not os.path.exists(subdirpath, "adding and removing files from subdirectories failure(4)")
+    print("[test] adding and removing more than a block's worth of directories (at once) passed")
 #https://pytutorial.com/python-os-module-file-system-operations-guide/#creating-files
 
 
@@ -41,16 +60,39 @@ def test_add_rem_from_sub(mountpoint):
 
 def test_add_rem_mult_block_simul(mountpoint):
     print(f"[test] adding and removing more than a block's worth of directories (at once)")
-    newdirs_path = "./alpha/beta/charlie/daniel/edward/frugal/giselle/helps/intelligent/jack/kim/leo/minecraft/newton/over/pond/quiz/rust/stair/tour/umbrella/veal/wise/xander/zed"
-    path = os.path.join(mountpoint, newdirs_path)
-    os.makedirs(path)
-    os.removedirs("./alpha")
-    #memo to find some way to assert this tmr, and include source
+    #SEE CONFIG ABOVE IF CONFUSED
+    n = (FSX492_BLKSZ/FSX492_DIRENTSZ)*2 #number of directories to add/remove at once (double the amount a blocks worth of directories)
+
+    #make a subdir to make life easier and change to there
+    os.mkdir('somecoolfoldername')
+    os.cwd('somecoolfoldername')
+
+    subdirpath = os.path.join(mountpoint, "somecoolfoldername")
+    sub_subdirpath = os.path.join(subdirpath, "testdir_"+list_of_dir_names[n/2]) #middlepoint of all the dirs created, used just to make testing simpler so not doing 1000 asserts
+    assert os.path.exists(subdirpath), "adding and removing more than a block's worth of directories (at once) failure(1)"
+
+    #https://www.tutorialspoint.com/article/make-multiple-directories-based-on-a-list-using-python
+    #make list of directories to add (each directory name is testdir_i, 
+    #where i is a number incremented by 1 bc 0 index, last directory number should be equal to n)
+    list_of_dir_names = []
+    for i in range(0, n):
+        list_of_dir_names.append("testdir_"+str(i+1))
+    for dir_name in list_of_dir_names:
+        os.makedirs(list_of_dir_names)
+    assert os.path.exists(sub_subdirpath), "adding and removing more than a block's worth of directories (at once) failure(2)"
+
+    #https://pynative.com/python-delete-files-and-directories/
+    os.cwd('..')
+    shutil.rmtree('somecoolfoldername') #https://stackoverflow.com/questions/10873364/shutil-rmtree-clarification
+
+    assert not os.path.exists(sub_subdirpath), "adding and removing more than a block's worth of directories (at once) failure(4)"
+    assert not os.path.exists(subdirpath), "adding and removing more than a block's worth of directories (at once) failure(3)"
+    print("[test] adding and removing more than a block's worth of directories (at once) passed")
 
 
 
 def test_file_overwrite(mountpoint):
-    print(f"overwriting a file (see `open` behavior)")
+    print(f"[test] overwriting a file (see `open` behavior) {mountpoint}")
     path = os.path.join(mountpoint, "hello.txt")
     with open(path, "w") as f: #make content to overwrite in test
         f.write("philippe")
@@ -62,9 +104,10 @@ def test_file_overwrite(mountpoint):
         newdata = f.read()
     assert(write_time == newdata, "overwriting content of file failure (2)")
     assert("philippe" not in newdata, "overwriting content of file failure(3)") #data overwritten
+    print("[test] overwriting a file (see `open` behavior) passed")
 
 def test_open_file_in_append(mountpoint):
-    print(f"opening a file in \"append\" mode (see `open` behavior)")
+    print(f"[test] opening a file in \"append\" mode (see `open` behavior) {mountpoint}")
     path = os.path.join(mountpoint, "hello.txt")
     with open(path, "w") as f: #make content to append to in test
         f.write("philippe")
@@ -76,33 +119,34 @@ def test_open_file_in_append(mountpoint):
         f.write(append_time) #https://www.geeksforgeeks.org/python/open-a-file-in-python/
         newdata = f.read()
     assert("philippe"+append_time == data, "opening a file in append mode failure(2)") #file content should be "philippe<remove_<>_and_time_goes_here>"
+    print("[test] opening a file in \"append\" mode (see `open` behavior) passed")
 
 def test_count_hard_links(mountpoint):
-    print(f"counting hard links")
+    print(f"[test] counting hard links {mountpoint}")
     #st = os.stat(mountpoint)
     path_a = os.path.join(mountpoint, "weloveryan.txt")
     path_b = os.path.join(mountpoint, "somefilename.txt")
     path_c = os.path.join(mountpoint, "onemorefileforgoodluck.txt")
     with open (path_a, 'w') as f:
         f.write('duncan is cool!') #deciding not to test write because overwrite test exists, this is just to make the file exist
-
     assert os.path.exists(path_a), "counting hard links failure(1)"
     oldst = os.stat(path_a)
     assert(st.st_nlink == 1, "counting hard links failure(2)") #https://docs.python.org/3/library/stat.html, file properly created with a singular link
 
     #https://www.geeksforgeeks.org/python/python-os-link-method/
-
     os.link(path_a, path_b)
     os.link(path_a, path_c)
     assert(st.st_nlink == 3, "counting hard links failure(3)") #https://docs.python.org/3/library/stat.html, file properly linked with 2 other files
-    os.unlink(path_c)
+
+    os.unlink(path_c) #https://www.delftstack.com/api/python/python-os-unlink/
     assert(st.st_nlink == 2, "counting hard links failure(4)") #https://docs.python.org/3/library/stat.html, file properly unlinked
+    print("[test] counting hard links passed")
 
 
 
 
 def test_acc_or_mod_time(mountpoint):
-    print(f"update access/modification time")
+    print(f"update access/modification time {mountpoint}")
     st = os.stat(mountpoint)
     old_atime = st.st_atime
     old_mtime = st.st_mtime
@@ -114,18 +158,20 @@ def test_acc_or_mod_time(mountpoint):
     assert(old_mtime != new_mtime, "update modification time failure(1)")
     assert(new_atime == 1330712280, "update access time failure(2)")
     assert(nwew_mtime == 1330712292, "update modification time failure(2)")
+    print("[test] update access/modification time passed")
 
 
 
 
 def test_change_perms(mountpoint):
-    print(f"changing permissions")
+    print(f"[test] changing permissions {mountpoint}")
     os.chmod(mountpoint, 0o444) #https://stackoverflow.com/questions/16249440/changing-file-permission-in-python
     st = os.stat(mountpoint)
     assert(os.access(mountpoint, os.R_OK), "changing perms failure(1)")
     assert(os.access(mountpoint, os.W_OK), "changing perms failure(2)")
     assert(os.access(mountpoint, os.X_OK), "changing perms failure(3)")
     #https://www.tutorialspoint.com/article/How-to-check-the-permissions-of-a-file-using-Python
+    print("[test] changing permissions passed")
 
 
 

@@ -67,7 +67,7 @@ See the `test.py` file for examples of how these can be written.
 You should create tests for at least the following conditions:
 
 - [X] adding and removing files from subdirectories
-- [ ] adding and removing more than a block's worth of directories (at once)
+- [X] adding and removing more than a block's worth of directories (at once)
 - [X] overwriting a file (see `open` behavior)
 - [X] opening a file in "append" mode (see `open` behavior)
 - [X] counting hard links
