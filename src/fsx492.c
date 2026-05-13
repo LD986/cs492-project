@@ -1965,12 +1965,12 @@ int fsx492_mkdir(const char * path, mode_t mode)
     int ret;
     uint32_t ino = 0, parent_ino = 0;
     // lookup parent directory path (see docs for `lookup_path`)
-    if(ret = lookup_path(path, &ino, &parent_ino) != 0){
+    if((ret = lookup_path(path, &ino, &parent_ino)) != 0){
         fprintf(stderr, "fsx492_mkdir: failed to lookup path\n");
         return ret;
     }
     // create a new directory inode
-    uint32_t ino = 0;
+    ino = 0;
     if ((ret = alloc_inode(&ino, ctx)) < 0) {
         fprintf(stderr, "fsx492_mkdir: failed to allocate inode\n");
         return ret;
@@ -2183,13 +2183,13 @@ int fsx492_link(const char * oldpath, const char * newpath)
     fprintf(stdout, "fsx492_link: %s -> %s\n", newpath, oldpath);
     assert(oldpath);
     assert(newpath);
-
+    int ret;
     // lookup paths
     uint32_t old_ino = 0, oldparent_ino = 0, new_ino = 0, newparent_ino = 0;
-    if ((ret = lookup_path(oldpath, &oldino, &oldparent_ino)) < 0) {
+    if ((ret = lookup_path(oldpath, &old_ino, &oldparent_ino)) < 0) {
         return ret;
     }
-    if ((ret = lookup_path(newpath, &newino, &newparent_ino)) < 0) {
+    if ((ret = lookup_path(newpath, &new_ino, &newparent_ino)) < 0) {
         return ret;
     }
     // link old inode to new directory inode
