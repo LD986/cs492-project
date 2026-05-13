@@ -17,10 +17,10 @@ Additional features implemented:
 These functions simulate disk operations.
 They are critical for anything to work correctly.
 
-- [ ] `blkdev_read`
-- [ ] `blkdev_write`
-- [ ] `blkdev_flush`
-- [ ] `blkdev_close`
+- [X] `blkdev_read`
+- [X] `blkdev_write`
+- [X] `blkdev_flush`
+- [X] `blkdev_close`
 
 ## `fsx492.c`
 
@@ -28,10 +28,10 @@ They are critical for anything to work correctly.
 
 These are important helper functions.
 
-- [ ] `search_block` (optional if not needed)
-- [ ] `find_entry`
-- [ ] `_link`
-- [ ] `_unlink`
+- [X] `search_block` (optional if not needed)
+- [X] `find_entry`
+- [X] `_link`
+- [X] `_unlink`
 
 ### FUSE Callbacks
 
@@ -40,14 +40,14 @@ These are the FUSE callbacks that need to be implemented.
 
 They are listed in suggested order of implementation.
 
-- [ ] `fsx492_getattr` (high priority)
-- [ ] `fsx492_opendir` (high priority)
-- [ ] `fsx492_releasedir` (high priority)
+- [X] `fsx492_getattr` (high priority)
+- [X] `fsx492_opendir` (high priority)
+- [X] `fsx492_releasedir` (high priority)
 - [ ] `fsx492_mkdir`
 - [ ] `fsx492_rmdir`
 - [ ] `fsx492_open`
 - [ ] `fsx492_release`
-- [ ] `fsx492_write` (difficult)
+- [X] `fsx492_write` (difficult)
 - [ ] `fsx492_link`
 - [ ] `fsx492_chmod`
 
