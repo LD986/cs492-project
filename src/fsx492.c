@@ -788,7 +788,7 @@ static int _truncate(uint32_t ino, off_t len, struct context * ctx)
     size_t first_freed = (len / FSX492_BLKSZ) + !!(len % FSX492_BLKSZ);
 
     // calculate how many blocks to free
-    size_t nfree = inode->blocks - first_freed;
+    ssize_t nfree = inode->blocks - first_freed;
     if (nfree < 0) {
         // desired length is longer than current length
         return 0;
@@ -2003,7 +2003,9 @@ int fsx492_mkdir(const char * path, mode_t mode)
     inode->nlink = 0;
     inode->blocks = 0;
     inode->ctime = inode->mtime = inode->atime = time(NULL);
-    inode->direct_blks[0] = 0;
+    for(int i = 0; i < FSX492_N_DIRECT; i++){ 
+        inode->direct_blks[i] = 0;
+    }
     inode->indir1_blks = 0;
     inode->indir2_blks = 0;
 
@@ -2025,8 +2027,13 @@ int fsx492_mkdir(const char * path, mode_t mode)
         return ret;
     }
 
+    if((ret = _link("..", parent_ino, ino, ctx)) < 0) {
+        return ret;
+    }
+
     // link new directory to parent directory
-    if((ret = _link("..", ino, parent_ino, ctx)) < 0) {
+
+    if((ret = _link(basename(path), ino, parent_ino, ctx)) < 0) {
         return ret;
     }
 
