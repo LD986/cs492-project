@@ -1320,7 +1320,7 @@ int fsx492_mknod(const char * path, mode_t mode, dev_t dev)
     inode->blocks = 0;
     inode->ctime = inode->mtime = inode->atime = time(NULL);
     for (int i = 0; i < FSX492_N_DIRECT; i++) {
-        inode->direct_blks[0] = 0;
+        inode->direct_blks[i] = 0;
     }
     inode->indir1_blks = 0;
     inode->indir2_blks = 0;
