@@ -41,8 +41,8 @@ FSX492_DIRENTSZ = 32
 
 def test_add_rem_from_sub(mountpoint):
     print(f"[test] adding and removing files from subdirectories {mountpoint}")
-    os.mkdir('somecoolfoldername')
     subdirpath = os.path.join(mountpoint, "somecoolfoldername")
+    os.mkdir(subdirpath)
     assert os.path.exists(subdirpath), "adding and removing files from subdirectories failure(1)"
     path = os.path.join(subdirpath, "weloveryan.txt")
     with open (path, 'w') as f:
