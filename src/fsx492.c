@@ -1224,7 +1224,6 @@ int fsx492_getattr(
 
     // lookup inode (or skip lookup if handle already open in fi)
 
-
     if (fi && fi->fh) {
         ino = ((struct fh *)fi->fh)->ino;
     } else if ((ret = lookup_path(path, &ino, NULL)) < 0) {
@@ -2239,7 +2238,7 @@ int fsx492_link(const char * oldpath, const char * newpath)
     if ((ret = lookup_path(oldpath, &old_ino, &oldparent_ino)) < 0) {
         return ret;
     }
-    if ((ret = lookup_path(newpath, &new_ino, &newparent_ino)) < 0) {
+    if ((ret = lookup_path(newpath, &new_ino, &newparent_ino)) == 0) {
         return ret;
     }
     // link old inode to new directory inode

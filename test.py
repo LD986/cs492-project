@@ -41,7 +41,7 @@ FSX492_DIRENTSZ = 32
 
 def test_add_rem_from_sub(mountpoint):
     print(f"[test] adding and removing files from subdirectories {mountpoint}")
-    subdirpath = os.path.join(mountpoint, "somecoolfoldername")
+    subdirpath = os.path.join(mountpoint, "6537")
     os.mkdir(subdirpath)
     assert os.path.exists(subdirpath), "adding and removing files from subdirectories failure(1)"
     path = os.path.join(subdirpath, "weloveryan.txt")
@@ -154,6 +154,7 @@ def test_count_hard_links(mountpoint):
     os.link(path_a, path_b)
     os.link(path_a, path_c)
     newst = os.stat(path_a)
+    print(newst.st_nlink)
     assert newst.st_nlink == 3, "counting hard links failure(3)" #https://docs.python.org/3/library/stat.html, file properly linked with 2 other files
 
     os.unlink(path_c) #https://www.delftstack.com/api/python/python-os-unlink/
