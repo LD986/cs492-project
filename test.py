@@ -79,7 +79,6 @@ def test_add_rem_mult_block_simul(mountpoint):
     for dir_name in list_of_dir_names:
         sub_subdirpath = os.path.join(subdirpath, "testdir_"+dir_name)
         os.mkdir(sub_subdirpath)
-        print(dir_name)
         assert os.path.exists(sub_subdirpath), "adding and removing more than a block's worth of directories (at once) failure(2)"
     #https://pynative.com/python-delete-files-and-directories/
     shutil.rmtree(subdirpath) #https://stackoverflow.com/questions/10873364/shutil-rmtree-clarification
