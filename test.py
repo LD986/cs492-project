@@ -48,10 +48,10 @@ def test_add_rem_from_sub(mountpoint):
     with open (path, 'w') as f:
         f.write('duncan is cool!') #deciding not to test write because overwrite test exists, this is just to make the file exist
     assert os.path.exists(path), "adding and removing files from subdirectories failure(2)"
-    os.remove('weloveryan.txt')
+    os.remove(path)
     assert not os.path.exists(path), "adding and removing files from subdirectories failure(3)"
     os.rmdir(subdirpath)
-    assert not os.path.exists(subdirpath, "adding and removing files from subdirectories failure(4)")
+    assert not os.path.exists(subdirpath), "adding and removing files from subdirectories failure(4)"
     print("[test] adding and removing more than a block's worth of directories (at once) passed")
 #https://pytutorial.com/python-os-module-file-system-operations-guide/#creating-files
 
@@ -61,15 +61,13 @@ def test_add_rem_from_sub(mountpoint):
 def test_add_rem_mult_block_simul(mountpoint):
     print(f"[test] adding and removing more than a block's worth of directories (at once) {mountpoint}")
     #SEE CONFIG ABOVE IF CONFUSED
-    n = (FSX492_BLKSZ/FSX492_DIRENTSZ)*2 #number of directories to add/remove at once (double the amount a blocks worth of directories)
-    print("wow")
+    n = int((FSX492_BLKSZ/FSX492_DIRENTSZ)*1.5) #number of directories to add/remove at once (approx 1.5x the amount a blocks worth of directories)
     #make a subdir to make life easier and change to there
 
 
     #something breaks before cool print after wow print
     subdirpath = os.path.join(mountpoint, "somecoolfoldername")
     os.mkdir(subdirpath)
-    print("cool")
     assert os.path.exists(subdirpath), "adding and removing more than a block's worth of directories (at once) failure(1)"
 
     #https://www.tutorialspoint.com/article/make-multiple-directories-based-on-a-list-using-python
@@ -81,11 +79,10 @@ def test_add_rem_mult_block_simul(mountpoint):
     for dir_name in list_of_dir_names:
         sub_subdirpath = os.path.join(subdirpath, "testdir_"+dir_name)
         os.mkdir(sub_subdirpath)
+        print(dir_name)
         assert os.path.exists(sub_subdirpath), "adding and removing more than a block's worth of directories (at once) failure(2)"
-
     #https://pynative.com/python-delete-files-and-directories/
-    os.cwd('..')
-    shutil.rmtree('somecoolfoldername') #https://stackoverflow.com/questions/10873364/shutil-rmtree-clarification
+    shutil.rmtree(subdirpath) #https://stackoverflow.com/questions/10873364/shutil-rmtree-clarification
 
     for dir_name in list_of_dir_names:
         sub_subdirpath = os.path.join(subdirpath, "testdir_"+dir_name)
