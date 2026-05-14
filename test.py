@@ -191,11 +191,13 @@ def test_acc_or_mod_time(mountpoint):
 
 def test_change_perms(mountpoint):
     print(f"[test] changing permissions {mountpoint}")
-    os.chmod(mountpoint, 0o444) #https://stackoverflow.com/questions/16249440/changing-file-permission-in-python
-    st = os.stat(mountpoint)
-    assert os.access(mountpoint, os.R_OK), "changing perms failure(1)"
-    assert os.access(mountpoint, os.W_OK), "changing perms failure(2)"
-    assert os.access(mountpoint, os.X_OK), "changing perms failure(3)"
+    path = os.path.join(mountpoint, "weloveryan.txt")
+    with open (path, 'w') as f:
+        f.write('duncan is cool!') #deciding not to test write because overwrite test exists, this is just to make the file exist
+    os.chmod(path, 0o777) #https://stackoverflow.com/questions/16249440/changing-file-permission-in-python
+    assert os.access(path, os.R_OK), "changing perms failure(1)"
+    assert os.access(path, os.W_OK), "changing perms failure(2)"
+    assert os.access(path, os.X_OK), "changing perms failure(3)"
     #https://www.tutorialspoint.com/article/How-to-check-the-permissions-of-a-file-using-Python
     print("[test] changing permissions passed")
 

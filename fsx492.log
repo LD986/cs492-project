@@ -2,4 +2,653 @@ blkdev_init: data/test.img
 blkdev_init: image { fd=3, size=1024 }
 FUSE library version: 3.17.2
 nullpath_ok: 0
-fusermount3: mounting over filesystem type 0x786f4256 is forbidden
+unique: 2, opcode: INIT (26), nodeid: 0, insize: 104, pid: 0
+INIT: 7.41
+flags=0x73fffffb
+max_readahead=0x00020000
+fsx492_init
+   INIT: 7.40
+   flags=0x4040f039
+   max_readahead=0x00020000
+   max_write=0x00100000
+   max_background=0
+   congestion_threshold=0
+   time_gran=1
+   unique: 2, success, outsize: 80
+unique: 4, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 4240
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 4, success, outsize: 120
+unique: 6, opcode: LOOKUP (1), nodeid: 1, insize: 55, pid: 20625
+LOOKUP /weloveryan.txt
+getattr[NULL] /weloveryan.txt
+fsx492_getattr: /weloveryan.txt
+find_entry
+   unique: 6, error: -2 (No such file or directory), outsize: 16
+unique: 8, opcode: CREATE (35), nodeid: 1, insize: 71, pid: 20625
+   unique: 8, error: -38 (Function not implemented), outsize: 16
+unique: 10, opcode: MKNOD (8), nodeid: 1, insize: 71, pid: 20625
+mknod /weloveryan.txt 0100664 0x0 umask=0002
+fsx492_mknod: /weloveryan.txt
+find_entry
+allocating inode 11
+fsx492_mknod: created file 11: /weloveryan.txt
+_link(name=weloveryan.txt, ino=11, dir_ino=1)
+find_entry
+getattr[NULL] /weloveryan.txt
+fsx492_getattr: /weloveryan.txt
+find_entry
+   NODEID: 2
+   unique: 10, success, outsize: 144
+unique: 12, opcode: OPEN (14), nodeid: 2, insize: 48, pid: 20625
+open flags: 0x8201 /weloveryan.txt
+fsx492_open: /weloveryan.txt
+find_entry
+   open[94903952774000] flags: 0x8201 /weloveryan.txt
+   unique: 12, success, outsize: 32
+unique: 14, opcode: GETATTR (3), nodeid: 2, insize: 56, pid: 20625
+getattr[NULL] /weloveryan.txt
+fsx492_getattr: /weloveryan.txt
+find_entry
+   unique: 14, success, outsize: 120
+unique: 16, opcode: IOCTL (39), nodeid: 2, insize: 72, pid: 20625
+   unique: 16, error: -38 (Function not implemented), outsize: 16
+unique: 18, opcode: GETXATTR (22), nodeid: 2, insize: 68, pid: 20625
+   unique: 18, error: -38 (Function not implemented), outsize: 16
+unique: 20, opcode: WRITE (16), nodeid: 2, insize: 95, pid: 20625
+write[94903952774000] 15 bytes to 0 flags: 0x8001
+fsx492_write: /weloveryan.txt (size=15, offset=0)
+allocating block 16
+   write[94903952774000] 15 bytes to 0
+   unique: 20, success, outsize: 24
+unique: 22, opcode: FLUSH (25), nodeid: 2, insize: 64, pid: 20625
+   unique: 22, error: -38 (Function not implemented), outsize: 16
+unique: 24, opcode: RELEASE (18), nodeid: 2, insize: 64, pid: 0
+release[94903952774000] flags: 0x8001
+fsx492_release: /weloveryan.txt
+   unique: 24, success, outsize: 16
+unique: 26, opcode: SETATTR (4), nodeid: 2, insize: 128, pid: 20625
+chmod[NULL] /weloveryan.txt 100777
+fsx492_chmod: /weloveryan.txt
+find_entry
+getattr[NULL] /weloveryan.txt
+fsx492_getattr: /weloveryan.txt
+find_entry
+   unique: 26, success, outsize: 120
+unique: 28, opcode: ACCESS (34), nodeid: 2, insize: 48, pid: 20625
+   unique: 28, error: -38 (Function not implemented), outsize: 16
+unique: 30, opcode: LOOKUP (1), nodeid: 1, insize: 45, pid: 20632
+LOOKUP /BDMV
+getattr[NULL] /BDMV
+fsx492_getattr: /BDMV
+find_entry
+   unique: 30, error: -2 (No such file or directory), outsize: 16
+unique: 32, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952774000] flags: 0x18800 /
+   unique: 32, success, outsize: 32
+unique: 34, opcode: LOOKUP (1), nodeid: 1, insize: 57, pid: 20631
+LOOKUP /.xdg-volume-info
+getattr[NULL] /.xdg-volume-info
+fsx492_getattr: /.xdg-volume-info
+find_entry
+   unique: 34, error: -2 (No such file or directory), outsize: 16
+unique: 36, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 36, success, outsize: 120
+unique: 38, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952774000] from 0
+fsx492_readdir: /
+   unique: 38, success, outsize: 1152
+unique: 40, opcode: LOOKUP (1), nodeid: 1, insize: 52, pid: 20633
+LOOKUP /autorun.inf
+getattr[NULL] /autorun.inf
+fsx492_getattr: /autorun.inf
+find_entry
+   unique: 40, error: -2 (No such file or directory), outsize: 16
+unique: 42, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 42, success, outsize: 16
+unique: 44, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 44, success, outsize: 16
+unique: 46, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952774000] flags: 0x0
+fsx492_releasedir: /
+   unique: 46, success, outsize: 16
+unique: 48, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952782256] flags: 0x18800 /
+   unique: 48, success, outsize: 32
+unique: 50, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 50, success, outsize: 120
+unique: 52, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952782256] from 0
+fsx492_readdir: /
+   unique: 52, success, outsize: 1152
+unique: 54, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 54, success, outsize: 16
+unique: 56, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 56, success, outsize: 16
+unique: 58, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952782256] flags: 0x0
+fsx492_releasedir: /
+   unique: 58, success, outsize: 16
+unique: 60, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952774000] flags: 0x18800 /
+   unique: 60, success, outsize: 32
+unique: 62, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 62, success, outsize: 120
+unique: 64, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952774000] from 0
+fsx492_readdir: /
+   unique: 64, success, outsize: 1152
+unique: 66, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 66, success, outsize: 16
+unique: 68, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 68, success, outsize: 16
+unique: 70, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952774000] flags: 0x0
+fsx492_releasedir: /
+   unique: 70, success, outsize: 16
+unique: 72, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952782256] flags: 0x18800 /
+   unique: 72, success, outsize: 32
+unique: 74, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 74, success, outsize: 120
+unique: 76, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952782256] from 0
+fsx492_readdir: /
+   unique: 76, success, outsize: 1152
+unique: 78, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 78, success, outsize: 16
+unique: 80, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 80, success, outsize: 16
+unique: 82, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952782256] flags: 0x0
+fsx492_releasedir: /
+   unique: 82, success, outsize: 16
+unique: 84, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952774000] flags: 0x18800 /
+   unique: 84, success, outsize: 32
+unique: 86, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 86, success, outsize: 120
+unique: 88, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952774000] from 0
+fsx492_readdir: /
+   unique: 88, success, outsize: 1152
+unique: 90, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 90, success, outsize: 16
+unique: 92, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 92, success, outsize: 16
+unique: 94, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952774000] flags: 0x0
+fsx492_releasedir: /
+   unique: 94, success, outsize: 16
+unique: 96, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952782256] flags: 0x18800 /
+   unique: 96, success, outsize: 32
+unique: 98, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 98, success, outsize: 120
+unique: 100, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952782256] from 0
+fsx492_readdir: /
+   unique: 100, success, outsize: 1152
+unique: 102, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 102, success, outsize: 16
+unique: 104, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 104, success, outsize: 16
+unique: 106, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952782256] flags: 0x0
+fsx492_releasedir: /
+   unique: 106, success, outsize: 16
+unique: 108, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952774000] flags: 0x18800 /
+   unique: 108, success, outsize: 32
+unique: 110, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 110, success, outsize: 120
+unique: 112, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952774000] from 0
+fsx492_readdir: /
+   unique: 112, success, outsize: 1152
+unique: 114, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 114, success, outsize: 16
+unique: 116, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 116, success, outsize: 16
+unique: 118, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952774000] flags: 0x0
+fsx492_releasedir: /
+   unique: 118, success, outsize: 16
+unique: 120, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952782256] flags: 0x18800 /
+   unique: 120, success, outsize: 32
+unique: 122, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 122, success, outsize: 120
+unique: 124, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952782256] from 0
+fsx492_readdir: /
+   unique: 124, success, outsize: 1152
+unique: 126, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 126, success, outsize: 16
+unique: 128, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 128, success, outsize: 16
+unique: 130, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952782256] flags: 0x0
+fsx492_releasedir: /
+   unique: 130, success, outsize: 16
+unique: 132, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952774000] flags: 0x18800 /
+   unique: 132, success, outsize: 32
+unique: 134, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 134, success, outsize: 120
+unique: 136, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952774000] from 0
+fsx492_readdir: /
+   unique: 136, success, outsize: 1152
+unique: 138, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 138, success, outsize: 16
+unique: 140, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 140, success, outsize: 16
+unique: 142, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952774000] flags: 0x0
+fsx492_releasedir: /
+   unique: 142, success, outsize: 16
+unique: 144, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952782256] flags: 0x18800 /
+   unique: 144, success, outsize: 32
+unique: 146, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 146, success, outsize: 120
+unique: 148, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952782256] from 0
+fsx492_readdir: /
+   unique: 148, success, outsize: 1152
+unique: 150, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 150, success, outsize: 16
+unique: 152, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 152, success, outsize: 16
+unique: 154, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952782256] flags: 0x0
+fsx492_releasedir: /
+   unique: 154, success, outsize: 16
+unique: 156, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952774000] flags: 0x18800 /
+   unique: 156, success, outsize: 32
+unique: 158, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 158, success, outsize: 120
+unique: 160, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952774000] from 0
+fsx492_readdir: /
+   unique: 160, success, outsize: 1152
+unique: 162, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 162, success, outsize: 16
+unique: 164, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 164, success, outsize: 16
+unique: 166, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952774000] flags: 0x0
+fsx492_releasedir: /
+   unique: 166, success, outsize: 16
+unique: 168, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952782256] flags: 0x18800 /
+   unique: 168, success, outsize: 32
+unique: 170, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 170, success, outsize: 120
+unique: 172, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952782256] from 0
+fsx492_readdir: /
+   unique: 172, success, outsize: 1152
+unique: 174, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 174, success, outsize: 16
+unique: 176, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 176, success, outsize: 16
+unique: 178, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952782256] flags: 0x0
+fsx492_releasedir: /
+   unique: 178, success, outsize: 16
+unique: 180, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952774000] flags: 0x18800 /
+   unique: 180, success, outsize: 32
+unique: 182, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 182, success, outsize: 120
+unique: 184, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952774000] from 0
+fsx492_readdir: /
+   unique: 184, success, outsize: 1152
+unique: 186, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 186, success, outsize: 16
+unique: 188, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 188, success, outsize: 16
+unique: 190, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952774000] flags: 0x0
+fsx492_releasedir: /
+   unique: 190, success, outsize: 16
+unique: 192, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952782256] flags: 0x18800 /
+   unique: 192, success, outsize: 32
+unique: 194, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 194, success, outsize: 120
+unique: 196, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952782256] from 0
+fsx492_readdir: /
+   unique: 196, success, outsize: 1152
+unique: 198, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 198, success, outsize: 16
+unique: 200, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 200, success, outsize: 16
+unique: 202, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952782256] flags: 0x0
+fsx492_releasedir: /
+   unique: 202, success, outsize: 16
+unique: 204, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952774000] flags: 0x18800 /
+   unique: 204, success, outsize: 32
+unique: 206, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 206, success, outsize: 120
+unique: 208, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952774000] from 0
+fsx492_readdir: /
+   unique: 208, success, outsize: 1152
+unique: 210, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 210, success, outsize: 16
+unique: 212, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 212, success, outsize: 16
+unique: 214, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952774000] flags: 0x0
+fsx492_releasedir: /
+   unique: 214, success, outsize: 16
+unique: 216, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952782256] flags: 0x18800 /
+   unique: 216, success, outsize: 32
+unique: 218, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 218, success, outsize: 120
+unique: 220, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952782256] from 0
+fsx492_readdir: /
+   unique: 220, success, outsize: 1152
+unique: 222, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 222, success, outsize: 16
+unique: 224, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 224, success, outsize: 16
+unique: 226, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952782256] flags: 0x0
+fsx492_releasedir: /
+   unique: 226, success, outsize: 16
+unique: 228, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952774000] flags: 0x18800 /
+   unique: 228, success, outsize: 32
+unique: 230, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 230, success, outsize: 120
+unique: 232, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952774000] from 0
+fsx492_readdir: /
+   unique: 232, success, outsize: 1152
+unique: 234, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 234, success, outsize: 16
+unique: 236, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 236, success, outsize: 16
+unique: 238, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952774000] flags: 0x0
+fsx492_releasedir: /
+   unique: 238, success, outsize: 16
+unique: 240, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952782256] flags: 0x18800 /
+   unique: 240, success, outsize: 32
+unique: 242, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 242, success, outsize: 120
+unique: 244, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952782256] from 0
+fsx492_readdir: /
+   unique: 244, success, outsize: 1152
+unique: 246, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 246, success, outsize: 16
+unique: 248, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 248, success, outsize: 16
+unique: 250, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952782256] flags: 0x0
+fsx492_releasedir: /
+   unique: 250, success, outsize: 16
+unique: 252, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952774000] flags: 0x18800 /
+   unique: 252, success, outsize: 32
+unique: 254, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 254, success, outsize: 120
+unique: 256, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952774000] from 0
+fsx492_readdir: /
+   unique: 256, success, outsize: 1152
+unique: 258, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 258, success, outsize: 16
+unique: 260, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 260, success, outsize: 16
+unique: 262, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952774000] flags: 0x0
+fsx492_releasedir: /
+   unique: 262, success, outsize: 16
+unique: 264, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952782256] flags: 0x18800 /
+   unique: 264, success, outsize: 32
+unique: 266, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 266, success, outsize: 120
+unique: 268, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952782256] from 0
+fsx492_readdir: /
+   unique: 268, success, outsize: 1152
+unique: 270, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 270, success, outsize: 16
+unique: 272, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 272, success, outsize: 16
+unique: 274, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952782256] flags: 0x0
+fsx492_releasedir: /
+   unique: 274, success, outsize: 16
+unique: 276, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952774000] flags: 0x18800 /
+   unique: 276, success, outsize: 32
+unique: 278, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 278, success, outsize: 120
+unique: 280, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952774000] from 0
+fsx492_readdir: /
+   unique: 280, success, outsize: 1152
+unique: 282, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 282, success, outsize: 16
+unique: 284, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 284, success, outsize: 16
+unique: 286, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952774000] flags: 0x0
+fsx492_releasedir: /
+   unique: 286, success, outsize: 16
+unique: 288, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952782256] flags: 0x18800 /
+   unique: 288, success, outsize: 32
+unique: 290, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 290, success, outsize: 120
+unique: 292, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952782256] from 0
+fsx492_readdir: /
+   unique: 292, success, outsize: 1152
+unique: 294, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 294, success, outsize: 16
+unique: 296, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 296, success, outsize: 16
+unique: 298, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952782256] flags: 0x0
+fsx492_releasedir: /
+   unique: 298, success, outsize: 16
+unique: 300, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952774000] flags: 0x18800 /
+   unique: 300, success, outsize: 32
+unique: 302, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 302, success, outsize: 120
+unique: 304, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952774000] from 0
+fsx492_readdir: /
+   unique: 304, success, outsize: 1152
+unique: 306, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 306, success, outsize: 16
+unique: 308, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 308, success, outsize: 16
+unique: 310, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952774000] flags: 0x0
+fsx492_releasedir: /
+   unique: 310, success, outsize: 16
+unique: 312, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952782256] flags: 0x18800 /
+   unique: 312, success, outsize: 32
+unique: 314, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 314, success, outsize: 120
+unique: 316, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952782256] from 0
+fsx492_readdir: /
+   unique: 316, success, outsize: 1152
+unique: 318, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 318, success, outsize: 16
+unique: 320, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 320, success, outsize: 16
+unique: 322, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952782256] flags: 0x0
+fsx492_releasedir: /
+   unique: 322, success, outsize: 16
+unique: 324, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 3113
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952774000] flags: 0x18800 /
+   unique: 324, success, outsize: 32
+unique: 326, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 3113
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 326, success, outsize: 120
+unique: 328, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 3113
+readdirplus[94903952774000] from 0
+fsx492_readdir: /
+   unique: 328, success, outsize: 1152
+unique: 330, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 330, success, outsize: 16
+unique: 332, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 3113
+   unique: 332, success, outsize: 16
+unique: 334, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952774000] flags: 0x0
+fsx492_releasedir: /
+   unique: 334, success, outsize: 16
+unique: 336, opcode: OPENDIR (27), nodeid: 1, insize: 48, pid: 20632
+opendir flags: 0x18800 /
+fsx492_opendir: /
+   opendir[94903952782256] flags: 0x18800 /
+   unique: 336, success, outsize: 32
+unique: 338, opcode: GETATTR (3), nodeid: 1, insize: 56, pid: 20632
+getattr[NULL] /
+fsx492_getattr: /
+   unique: 338, success, outsize: 120
+unique: 340, opcode: READDIRPLUS (44), nodeid: 1, insize: 80, pid: 20631
+readdirplus[94903952782256] from 0
+fsx492_readdir: /
+   unique: 340, success, outsize: 1152
+unique: 342, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 20631
+   unique: 342, success, outsize: 16
+unique: 344, opcode: READDIR (28), nodeid: 1, insize: 80, pid: 20631
+   unique: 344, success, outsize: 16
+unique: 346, opcode: RELEASEDIR (29), nodeid: 1, insize: 64, pid: 0
+releasedir[94903952782256] flags: 0x0
+fsx492_releasedir: /
+   unique: 346, success, outsize: 16
+unique: 348, opcode: LOOKUP (1), nodeid: 1, insize: 52, pid: 20632
+LOOKUP /autorun.inf
+getattr[NULL] /autorun.inf
+fsx492_getattr: /autorun.inf
+find_entry
+   unique: 348, error: -2 (No such file or directory), outsize: 16
+fsx492_destroy
+writing dirty metadata to image...
+freeing context...
+closing disk...
+fsx492 destroyed
