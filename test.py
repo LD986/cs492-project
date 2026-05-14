@@ -150,13 +150,23 @@ def test_count_hard_links(mountpoint):
     #https://www.geeksforgeeks.org/python/python-os-link-method/
     os.link(path_a, path_b)
     os.link(path_a, path_c)
+
+    with open (path_a, 'r') as f:
+        a_data = f.read()
+    with open (path_b, 'r') as f:
+        b_data = f.read()
+    assert a_data == b_data, "counting hard links failure(3)"
+
     newst = os.stat(path_a)
-    print(newst.st_nlink)
-    assert newst.st_nlink == 3, "counting hard links failure(3)" #https://docs.python.org/3/library/stat.html, file properly linked with 2 other files
+    assert newst.st_nlink == 3, "counting hard links failure(4)" #https://docs.python.org/3/library/stat.html, file properly linked with 2 other files
 
     os.unlink(path_c) #https://www.delftstack.com/api/python/python-os-unlink/
+    with open (path_a, 'r') as f:
+        a_data = f.read()
+    #for some reason it needs to open the path_a for the path_a stats to update
+    #did this for previous assert to
     newestst = os.stat(path_a)
-    assert newestst.st_nlink == 2, "counting hard links failure(4)" #https://docs.python.org/3/library/stat.html, file properly unlinked
+    assert newestst.st_nlink == 2, "counting hard links failure(5)" #https://docs.python.org/3/library/stat.html, file properly unlinked
     print("[test] counting hard links passed")
 
 
